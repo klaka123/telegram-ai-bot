@@ -1,0 +1,5 @@
+telegram-ai-bot/
+├── bot.py              # Основной код бота
+├── model.py            # Код нейросети
+├── requirements.txt    # Зависимости
+└── README.md           # Инструкция
