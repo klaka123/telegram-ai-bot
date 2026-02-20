@@ -22,7 +22,7 @@ class MegaBot:
     
     def __init__(self):
         # Пытаемся получить ключ из секретов
-        self.api_key = os.environ.get('OPENROUTER_KEY')
+        self.api_key = os.environ.get('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')
         
         # Если нет в секретах, можно вставить прямо сюда (временное решение)
         # self.api_key = "sk-or-v1-..."  # раскомментируй и вставь свой ключ
