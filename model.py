@@ -1,6 +1,6 @@
 """
-🤖 СУПЕР-БОТ — ТРИ БЫСТРЫЕ МОДЕЛИ (ФЕВРАЛЬ 2026)
-Gemini 2.0 Flash + Trinity Large + Step 3.5 Flash
+🤖 СУПЕР-БОТ — 15+ БЕСПЛАТНЫХ МОДЕЛЕЙ (ФЕВРАЛЬ 2026)
+Автоматически выбирает самую быструю доступную модель
 """
 
 import os
@@ -11,9 +11,9 @@ from datetime import datetime
 
 class SuperBot:
     def __init__(self):
-        print("=" * 70)
-        print("🤖 ЗАПУСК ТРЁХ БЫСТРЫХ НЕЙРОСЕТЕЙ")
-        print("=" * 70)
+        print("=" * 80)
+        print("🤖 ЗАПУСК СУПЕР-БОТА С 15+ БЕСПЛАТНЫМИ МОДЕЛЯМИ")
+        print("=" * 80)
         
         self.api_key = os.environ.get('OPENROUTER_KEY')
         
@@ -23,36 +23,136 @@ class SuperBot:
             print("❌ КЛЮЧ OPENROUTER НЕ НАЙДЕН!")
             print("   Добавь OPENROUTER_KEY в Secrets GitHub!")
         
-        # ⭐ ТРИ САМЫЕ БЫСТРЫЕ МОДЕЛИ ⭐
+        # ⭐ ПОЛНЫЙ СПИСОК БЕСПЛАТНЫХ МОДЕЛЕЙ ⭐
         self.models = [
+            # Vision модели (понимают фото)
             {
                 "name": "google/gemini-2.0-flash-exp:free",
+                "vision": True,
                 "timeout": 8,
-                "emoji": "⚡",
-                "description": "Gemini 2.0 Flash (самая быстрая, 1M контекста)"
+                "speed": "⚡⚡⚡⚡⚡",
+                "desc": "Gemini 2.0 Flash (1M контекста, фото)"
             },
             {
-                "name": "arcee-ai/trinity-large-preview:free",
-                "timeout": 10,
-                "emoji": "🎯",
-                "description": "Trinity Large (100% uptime, отличная математика)"
+                "name": "qwen/qwen3-vl-235b-a22b-thinking:free",
+                "vision": True,
+                "timeout": 12,
+                "speed": "⚡⚡⚡",
+                "desc": "Qwen3 VL 235B (видео, фото)"
             },
+            {
+                "name": "nvidia/nemotron-nano-2-vl:free",
+                "vision": True,
+                "timeout": 10,
+                "speed": "⚡⚡⚡⚡",
+                "desc": "NVIDIA Nemotron VL (OCR, видео)"
+            },
+            {
+                "name": "moonshotai/kimi-vl-a3b-thinking:free",
+                "vision": True,
+                "timeout": 8,
+                "speed": "⚡⚡⚡⚡",
+                "desc": "Kimi VL A3B (лёгкая, быстрая)"
+            },
+            
+            # Очень быстрые текстовые модели
             {
                 "name": "stepfun/step-3.5-flash:free",
+                "vision": False,
+                "timeout": 6,
+                "speed": "⚡⚡⚡⚡⚡",
+                "desc": "Step 3.5 Flash (молниеносная)"
+            },
+            {
+                "name": "z-ai/glm-4.5-air:free",
+                "vision": False,
+                "timeout": 7,
+                "speed": "⚡⚡⚡⚡",
+                "desc": "GLM-4.5-Air (быстрая)"
+            },
+            
+            # Универсальные мощные модели
+            {
+                "name": "arcee-ai/trinity-large-preview:free",
+                "vision": False,
+                "timeout": 10,
+                "speed": "⚡⚡⚡",
+                "desc": "Trinity Large (100% uptime)"
+            },
+            {
+                "name": "qwen/qwen3-235b-a22b-thinking:free",
+                "vision": False,
+                "timeout": 12,
+                "speed": "⚡⚡",
+                "desc": "Qwen3 235B (математика)"
+            },
+            {
+                "name": "meta-llama/llama-3.3-70b-instruct:free",
+                "vision": False,
+                "timeout": 10,
+                "speed": "⚡⚡⚡",
+                "desc": "Llama 3.3 70B (мультиязычная)"
+            },
+            {
+                "name": "openai/gpt-oss-120b:free",
+                "vision": False,
+                "timeout": 10,
+                "speed": "⚡⚡⚡",
+                "desc": "GPT-OSS 120B (открытая OpenAI)"
+            },
+            
+            # Специализированные модели
+            {
+                "name": "deepseek/deepseek-r1:free",
+                "vision": False,
+                "timeout": 12,
+                "speed": "⚡⚡",
+                "desc": "DeepSeek R1 (логика)"
+            },
+            {
+                "name": "openrouter/aurora-alpha:free",
+                "vision": False,
                 "timeout": 8,
-                "emoji": "🚀",
-                "description": "Step 3.5 Flash (быстрая, стабильная)"
+                "speed": "⚡⚡⚡⚡",
+                "desc": "Aurora Alpha (кодинг, агенты)"
+            },
+            {
+                "name": "openrouter/pony-alpha:free",
+                "vision": False,
+                "timeout": 9,
+                "speed": "⚡⚡⚡",
+                "desc": "Pony Alpha (GLM-5, агенты)"
+            },
+            {
+                "name": "upstage/solar-pro-3:free",
+                "vision": False,
+                "timeout": 8,
+                "speed": "⚡⚡⚡⚡",
+                "desc": "Solar Pro 3 (многоязычная)"
+            },
+            {
+                "name": "arcee-ai/trinity-mini:free",
+                "vision": False,
+                "timeout": 6,
+                "speed": "⚡⚡⚡⚡⚡",
+                "desc": "Trinity Mini (очень быстрая)"
             }
         ]
         
-        print(f"\n✅ Модель 1: {self.models[0]['description']}")
-        print(f"✅ Модель 2: {self.models[1]['description']}")
-        print(f"✅ Модель 3: {self.models[2]['description']}")
+        print(f"\n📊 ЗАГРУЖЕНО МОДЕЛЕЙ: {len(self.models)}")
+        print("=" * 80)
+        
+        # Группируем по скорости
+        fast_models = [m for m in self.models if "⚡⚡⚡⚡" in m["speed"]]
+        vision_models = [m for m in self.models if m["vision"]]
+        
+        print(f"⚡ Сверхбыстрых: {len(fast_models)}")
+        print(f"📸 С поддержкой фото: {len(vision_models)}")
+        print("=" * 80)
         
         self.user_contexts = {}
-        print("=" * 70)
-        print("🚀 ТРИ БЫСТРЫЕ НЕЙРОСЕТИ ГОТОВЫ!")
-        print("=" * 70)
+        print("🚀 СУПЕР-БОТ ГОТОВ К РАБОТЕ!")
+        print("=" * 80)
     
     def ask_model(self, model_config, messages):
         """Спрашивает одну модель с таймаутом"""
@@ -80,106 +180,13 @@ class SuperBot:
             if response.status_code == 200:
                 result = response.json()
                 answer = result["choices"][0]["message"]["content"]
-                print(f"      {model_config['emoji']} Ответ за {elapsed:.1f}с")
+                print(f"      ✅ {model_config['desc'][:25]}... за {elapsed:.1f}с")
                 return answer
             else:
-                error_data = response.json()
-                error_msg = error_data.get('error', {}).get('message', 'Неизвестная ошибка')
-                print(f"      ❌ Ошибка: {response.status_code}")
                 return None
                 
-        except requests.exceptions.Timeout:
-            print(f"      ⏱️ Таймаут {model_config['timeout']}с")
+        except Exception:
             return None
-        except Exception as e:
-            print(f"      ❌ Ошибка")
-            return None
-    
-    def ensemble_think(self, user_id, question, is_photo=False):
-        """Три модели думают и объединяют ответы"""
-        
-        # Системный промпт для всех моделей
-        if is_photo:
-            system_prompt = """Ты — гений математики. Найди на фото все математические примеры и реши их правильно.
-Отвечай кратко и по делу. Решай строго по правилам: сначала умножение/деление, потом сложение/вычитание.
-Например: 150+150/2 = 150+75 = 225"""
-        else:
-            system_prompt = """Ты — умный помощник. Отвечай кратко и по делу.
-Решай математику строго по правилам: сначала умножение/деление, потом сложение/вычитание.
-Например: 150+150/2 = 150+75 = 225"""
-        
-        messages = [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": question}
-        ]
-        
-        print(f"\n🤔 Опрашиваю три быстрые нейросети...")
-        
-        # Опрашиваем все три модели параллельно
-        answers = []
-        working_models = []
-        
-        for i, model in enumerate(self.models, 1):
-            print(f"   {i}. {model['description'][:30]}... ", end="")
-            answer = self.ask_model(model, messages)
-            if answer:
-                answers.append(answer)
-                working_models.append(model)
-        
-        # Анализируем результаты
-        if not answers:
-            return "❌ Извини, сейчас все нейросети временно недоступны. Попробуй через минуту!"
-        
-        if len(answers) == 1:
-            return answers[0] + "\n\n_⚡ Ответ от одной нейросети_"
-        
-        if len(answers) == 2:
-            # Объединяем два ответа через главную модель
-            merge_prompt = f"""Вот два ответа от разных ИИ на вопрос: "{question}"
-
-ОТВЕТ 1:
-{answers[0]}
-
-ОТВЕТ 2:
-{answers[1]}
-
-Объедини их в один лучший ответ. Возьми лучшее из каждого.
-Ответ должен быть точным и полным."""
-            
-            merge_messages = [
-                {"role": "system", "content": "Ты — главный аналитик."},
-                {"role": "user", "content": merge_prompt}
-            ]
-            
-            print("🔄 Объединяю два ответа...")
-            final = self.ask_model(self.models[0], merge_messages)
-            return final if final else answers[0]
-        
-        # Три ответа — объединяем через Trinity (лучшая для анализа)
-        merge_prompt = f"""Вот три ответа от разных ИИ на вопрос: "{question}"
-
-ОТВЕТ 1 (Gemini):
-{answers[0]}
-
-ОТВЕТ 2 (Trinity):
-{answers[1]}
-
-ОТВЕТ 3 (Step):
-{answers[2]}
-
-Создай ОДИН ИТОГОВЫЙ ЛУЧШИЙ ОТВЕТ.
-Возьми лучшее из каждого ответа, убери повторы, исправь ошибки.
-В конце добавь: "✅ Ответ проверен тремя быстрыми нейросетями"."""
-        
-        merge_messages = [
-            {"role": "system", "content": "Ты — главный аналитик, объединяющий ответы трёх ИИ."},
-            {"role": "user", "content": merge_prompt}
-        ]
-        
-        print("🔄 Объединяю три ответа...")
-        final_answer = self.ask_model(self.models[1], merge_messages)  # Trinity как анализатор
-        
-        return final_answer if final_answer else answers[0]
     
     def get_response(self, user_id, message):
         """Основной метод для текстовых запросов"""
@@ -187,25 +194,26 @@ class SuperBot:
         if not self.api_key:
             return "❌ Нет ключа OpenRouter. Добавь OPENROUTER_KEY в секреты!"
         
-        # Создаём контекст
-        if user_id not in self.user_contexts:
-            self.user_contexts[user_id] = []
+        # Системный промпт
+        messages = [
+            {"role": "system", "content": "Ты — умный помощник. Решай математику правильно: 150+150/2 = 225. Отвечай кратко и по делу."},
+            {"role": "user", "content": message}
+        ]
         
-        self.user_contexts[user_id].append({"role": "user", "content": message})
+        print(f"\n📨 Запрос: {message[:50]}...")
+        print(f"🔄 Пробую {len(self.models)} моделей по очереди...")
         
-        # Получаем ответ
-        answer = self.ensemble_think(user_id, message, is_photo=False)
+        # Пробуем модели по очереди (сначала самые быстрые)
+        for i, model in enumerate(self.models, 1):
+            print(f"   {i}. {model['desc'][:30]}... ", end="")
+            answer = self.ask_model(model, messages)
+            if answer:
+                return answer
         
-        self.user_contexts[user_id].append({"role": "assistant", "content": answer})
-        
-        # Ограничиваем историю
-        if len(self.user_contexts[user_id]) > 20:
-            self.user_contexts[user_id] = self.user_contexts[user_id][-20:]
-        
-        return answer
+        return "❌ Все нейросети временно недоступны. Попробуй через минуту!"
     
     def analyze_photo(self, photo_bytes, user_id):
-        """Анализирует фото"""
+        """Анализирует фото (только vision-модели)"""
         
         if not self.api_key:
             return "❌ Нет ключа OpenRouter. Добавь OPENROUTER_KEY в секреты!"
@@ -213,7 +221,6 @@ class SuperBot:
         try:
             base64_image = base64.b64encode(photo_bytes).decode('utf-8')
             
-            # Создаём сообщение с фото
             image_message = [
                 {
                     "role": "user",
@@ -228,21 +235,18 @@ class SuperBot:
                 }
             ]
             
-            print("\n📸 Анализирую фото тремя нейросетями...")
+            print(f"\n📸 Анализирую фото {len(self.models)} vision-моделями...")
             
-            # Пробуем все модели (Gemini и Trinity понимают фото)
-            answers = []
-            for model in self.models[:2]:  # Gemini и Trinity понимают фото
-                print(f"   Пробую {model['description'][:20]}...")
+            # Берём только vision-модели
+            vision_models = [m for m in self.models if m["vision"]]
+            
+            for i, model in enumerate(vision_models, 1):
+                print(f"   {i}. {model['desc'][:30]}... ", end="")
                 answer = self.ask_model(model, image_message)
                 if answer:
-                    answers.append(answer)
-                    break  # Берём первый успешный ответ
+                    return answer + "\n\n📸 _Проанализировано нейросетью_"
             
-            if answers:
-                return answers[0] + "\n\n📸 _Проанализировано нейросетью_"
-            else:
-                return "❌ Не удалось проанализировать фото. Попробуй ещё раз."
+            return "❌ Не удалось проанализировать фото. Попробуй ещё раз."
             
         except Exception as e:
             return f"❌ Ошибка: {str(e)}"
