@@ -1,112 +1,94 @@
 """
-🤖 СУПЕР-БОТ — С НАДЕЖНЫМИ ТАЙМАУТАМИ
-Никаких зависаний!
+🤖 СУПЕР-БОТ — ДИАГНОСТИЧЕСКАЯ ВЕРСИЯ
+Показывает реальные ошибки OpenRouter
 """
 
 import os
 import base64
 import requests
-import time
 from datetime import datetime
 
 class SuperBot:
     def __init__(self):
-        print("=" * 60)
-        print("🤖 ЗАПУСК БОТА (С ТАЙМАУТАМИ)")
-        print("=" * 60)
+        print("=" * 70)
+        print("🔍 ДИАГНОСТИЧЕСКАЯ ВЕРСИЯ")
+        print("=" * 70)
         
         self.api_key = os.environ.get('OPENROUTER_KEY')
         
         if self.api_key:
-            print(f"✅ КЛЮЧ OPENROUTER НАЙДЕН!")
+            print(f"✅ КЛЮЧ OPENROUTER НАЙДЕН! Длина: {len(self.api_key)}")
         else:
-            print("❌ КЛЮЧ OPENROUTER НЕ НАЙДЕН!")
+            print("❌ КЛЮЧ НЕ НАЙДЕН!")
         
-        # Модели по порядку
-        self.models = [
-            {"name": "google/gemini-2.0-flash-exp:free", "timeout": 10},
-            {"name": "microsoft/phi-3.5-mini-128k-instruct:free", "timeout": 8},
-            {"name": "qwen/qwen2.5-vl-7b-instruct:free", "timeout": 10}
-        ]
-        
-        print(f"\n✅ Модель 1: Gemini 2.0 Flash (таймаут 10с)")
-        print(f"✅ Модель 2: Microsoft Phi-3.5 (таймаут 8с)")
-        print(f"✅ Модель 3: Qwen VL (таймаут 10с)")
-        
-        self.user_contexts = {}
-        print("=" * 60)
-        print("🚀 БОТ ГОТОВ К РАБОТЕ!")
-        print("=" * 60)
+        # Единственная модель для теста
+        self.model = "google/gemini-2.0-flash-exp:free"
+        print(f"✅ МОДЕЛЬ: {self.model}")
+        print("=" * 70)
     
-    def ask_model(self, model_config, messages):
-        """Спрашивает одну модель с таймаутом"""
+    def ask_model(self, messages):
+        """Прямой запрос к OpenRouter"""
         try:
-            start_time = time.time()
-            
             response = requests.post(
                 url="https://openrouter.ai/api/v1/chat/completions",
                 headers={
                     "Authorization": f"Bearer {self.api_key}",
                     "Content-Type": "application/json",
-                    "HTTP-Referer": "https://github.com/",
                 },
                 json={
-                    "model": model_config["name"],
+                    "model": self.model,
                     "messages": messages,
                     "temperature": 0.7,
-                    "max_tokens": 800,
+                    "max_tokens": 500,
                 },
-                timeout=model_config["timeout"]  # Индивидуальный таймаут
+                timeout=15  # Не ждем долго
             )
             
-            elapsed = time.time() - start_time
-            print(f"      Ответ за {elapsed:.1f}с")
+            # Показываем статус ответа
+            print(f"📊 Статус ответа: {response.status_code}")
             
-            result = response.json()
-            
-            if "choices" in result:
+            if response.status_code == 200:
+                result = response.json()
                 return result["choices"][0]["message"]["content"]
             else:
-                return None
+                # Показываем реальную ошибку
+                error_data = response.json()
+                error_msg = error_data.get('error', {}).get('message', 'Неизвестная ошибка')
+                error_code = error_data.get('error', {}).get('code', response.status_code)
+                
+                # Человеческое объяснение ошибки [citation:8]
+                if error_code == 402:
+                    return "❌ Закончились бесплатные запросы на сегодня. Лимит 50 сообщений/день для бесплатных аккаунтов. Сброс в 19:00 по Москве."
+                elif error_code == 429:
+                    return "❌ Слишком много запросов. Подождите немного."
+                elif error_code == 404:
+                    return "❌ Модель временно недоступна. Попробуйте позже."
+                else:
+                    return f"❌ Ошибка {error_code}: {error_msg}"
                 
         except requests.exceptions.Timeout:
-            print(f"      ⏱️ Таймаут {model_config['timeout']}с")
-            return None
+            return "❌ Таймаут — сервер не отвечает. Попробуйте позже."
         except Exception as e:
-            print(f"      ❌ Ошибка")
-            return None
+            return f"❌ Ошибка подключения: {str(e)}"
     
     def get_response(self, user_id, message):
-        """Получает ответ от первой ответившей модели"""
-        
+        """Простой ответ"""
         if not self.api_key:
-            return "❌ Нет ключа OpenRouter. Добавь OPENROUTER_KEY в секреты!"
+            return "❌ Добавь OPENROUTER_KEY в секреты GitHub!"
         
-        print(f"\n📨 Запрос: {message[:50]}...")
-        
-        # Системный промпт
         messages = [
-            {"role": "system", "content": "Ты — умный помощник. Отвечай кратко и по делу. Решай математику правильно: 150+150/2 = 225."},
+            {"role": "system", "content": "Ты помощник. Отвечай кратко."},
             {"role": "user", "content": message}
         ]
         
-        # Пробуем модели по очереди с таймаутами
-        for model in self.models:
-            print(f"🔄 Пробую {model['name'][:20]}...")
-            answer = self.ask_model(model, messages)
-            if answer:
-                return answer
-        
-        # Если все модели не ответили
-        return "❌ Ни одна нейросеть не ответила вовремя. Попробуй через минуту!"
+        return self.ask_model(messages)
     
     def analyze_photo(self, photo_bytes):
-        """Анализирует фото"""
+        """Анализ фото"""
         try:
             base64_image = base64.b64encode(photo_bytes).decode('utf-8')
-            
             messages = [
-                {"role": "system", "content": "Ты — гений математики. Реши примеры на фото."},
+                {"role": "system", "content": "Реши примеры на фото."},
                 {
                     "role": "user",
                     "content": [
@@ -119,16 +101,8 @@ class SuperBot:
                     ]
                 }
             ]
-            
-            # Пробуем модели по очереди
-            for model in self.models:
-                answer = self.ask_model(model, messages)
-                if answer:
-                    return answer
-            
-            return "❌ Не удалось проанализировать фото."
-            
+            return self.ask_model(messages)
         except Exception as e:
-            return f"❌ Ошибка: {str(e)}"
+            return f"❌ Ошибка фото: {str(e)}"
 
 brain = SuperBot()
