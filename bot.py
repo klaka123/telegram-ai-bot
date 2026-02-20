@@ -42,7 +42,6 @@ def start(message):
 • Понимаю тригонометрию (sin 30°)
 • Отвечаю на любые вопросы
 • Рассказываю шутки и факты
-• Анализирую фото
 
 📝 **Примеры запросов:**
 • `реши x + 5 = 10`
@@ -86,9 +85,6 @@ def help_command(message):
 • `расскажи шутку`
 • `интересный факт`
 • `кто ты`
-
-📸 **ФОТО:**
-• Отправь фото - я проанализирую
 
 ⚙️ **КОМАНДЫ:**
 /start - Начать
@@ -144,7 +140,6 @@ def about_command(message):
 🧠 **ОБ АБСОЛЮТНОМ ИИ**
 
 **Версия:** 10.0 (Мировой уровень)
-**Создатель:** Ты! 
 
 📚 **База знаний:**
 • Математика: 1,000,000+ формул
@@ -171,19 +166,22 @@ def about_command(message):
 def handle_photo(message):
     """Обработка фотографий"""
     
-    # Получаем фото
-    file_id = message.photo[-1].file_id
-    file_info = bot.get_file(file_id)
-    downloaded_file = bot.download_file(file_info.file_path)
-    
-    # Показываем что бот думает
-    bot.send_chat_action(message.chat.id, 'typing')
-    
-    # Анализируем фото
-    analysis = brain.analyze_photo(downloaded_file)
-    
-    # Отправляем результат
-    bot.reply_to(message, analysis)
+    try:
+        # Получаем фото
+        file_id = message.photo[-1].file_id
+        file_info = bot.get_file(file_id)
+        downloaded_file = bot.download_file(file_info.file_path)
+        
+        # Показываем что бот думает
+        bot.send_chat_action(message.chat.id, 'typing')
+        
+        # Анализируем фото
+        analysis = brain.analyze_photo(downloaded_file)
+        
+        # Отправляем результат
+        bot.reply_to(message, analysis)
+    except Exception as e:
+        bot.reply_to(message, f"❌ Ошибка при обработке фото: {str(e)}")
 
 # ========== ОБРАБОТКА СООБЩЕНИЙ ==========
 @bot.message_handler(func=lambda m: True)
@@ -211,7 +209,6 @@ def handle_message(message):
         return
     
     if user_text == '🎭 Шутка':
-        # Превращаем кнопку в запрос
         user_text = "расскажи шутку"
     
     if user_text == '🔍 Факт':
@@ -254,7 +251,7 @@ if __name__ == "__main__":
     print("=" * 70)
     print("🤖 АБСОЛЮТНЫЙ TELEGRAM БОТ v10.0")
     print("=" * 70)
-    print("🧠 Уровень: Мировой (ChatGPT + DeepSeek × 2)")
+    print("🧠 Уровень: Мировой (ChatGPT + DeepSeek)")
     print("📚 Знаний: 10,000,000+ ответов")
     print("📐 Математика: Полная")
     print("📏 Геометрия: Полная")
@@ -264,4 +261,5 @@ if __name__ == "__main__":
     print("🚀 БОТ ЗАПУЩЕН И ГОТОВ К РАБОТЕ!")
     print("=" * 70)
     
+    # Запускаем бота
     bot.infinity_polling()
