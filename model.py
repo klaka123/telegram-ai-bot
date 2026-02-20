@@ -17,7 +17,7 @@ class SuperBot:
         print("=" * 60)
         
         # Получаем ключ из секретов
-        self.api_key = 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
+        self.api_key = os.environ.get('OPENROUTER_KEY')
         
         if self.api_key:
             print(f"✅ КЛЮЧ OPENROUTER НАЙДЕН! Длина: {len(self.api_key)}")
