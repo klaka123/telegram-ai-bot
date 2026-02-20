@@ -1,5 +1,5 @@
 """
-🤖 TELEGRAM БОТ — ИИ-ПАРЛАМЕНТ ИЗ 20+ НЕЙРОСЕТЕЙ
+TELEGRAM БОТ — АНАЛИТИЧЕСКАЯ СИСТЕМА
 """
 
 import os
@@ -18,49 +18,54 @@ bot_start = datetime.now()
 @bot.message_handler(commands=['start'])
 def start(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    markup.row('📸 Фото', '🧮 Пример')
-    markup.row('🎭 Шутка', '🔍 Факт', '❓ Помощь')
+    markup.row('📷 Фото', '📝 Пример')
+    markup.row('🎭 Шутка', '📊 Факт', '❓ Помощь')
     
     welcome = """
-🌟 **ИИ-ПАРЛАМЕНТ — 20+ НЕЙРОСЕТЕЙ** 🌟
+АНАЛИТИЧЕСКАЯ СИСТЕМА — 20+ НЕЙРОСЕТЕЙ
 
-🧠 **КАК ЭТО РАБОТАЕТ:**
-• 20+ нейросетей одновременно думают над вопросом
-• Подсчитывается ответ большинства
-• Выдаётся ЕДИНСТВЕННО ПРАВИЛЬНЫЙ ОТВЕТ
+Принцип работы:
+• 20+ нейросетей одновременно анализируют вопрос
+• Система находит консенсус большинства
+• Выдаётся единый точный ответ
 
-📸 **ФОТО:** отправляй — проанализируют vision-модели
-🧮 **ПРИМЕР:** 150 + 150 / 2 = 225
+Возможности:
+• Математика (150 + 150 / 2 = 225)
+• Распознавание фото
+• Ответы на вопросы
+• Факты и шутки
 
-📝 **ПРОСТО НАПИШИ МНЕ!**
+Введите запрос или отправьте фото.
     """
     
-    bot.send_message(message.chat.id, welcome, reply_markup=markup, parse_mode='Markdown')
+    bot.send_message(message.chat.id, welcome, reply_markup=markup)
     users[message.from_user.id] = {'messages': 0}
 
 @bot.message_handler(commands=['help'])
 def help_command(message):
     help_text = """
-📚 **КОМАНДЫ:**
-/start - Начать
-/help - Помощь
-/clear - Очистить память
+Доступные команды:
+/start - начало работы
+/help - справка
+/clear - сброс диалога
 
-📸 **Фото:** отправь фото с примером
-🧮 **Примеры:** 150+150/2, cos30, x²-5x+6=0
-🎭 **Шутка:** расскажи шутку
-🔍 **Факт:** интересный факт
+Примеры запросов:
+• 150 + 150 / 2
+• cos 30°
+• x² - 5x + 6 = 0
+• расскажи шутку
+• интересный факт
 
-**🧠 20+ нейросетей думают над каждым ответом!**
+Для анализа фото отправьте изображение.
     """
     bot.reply_to(message, help_text)
 
 @bot.message_handler(commands=['clear'])
 def clear_command(message):
     if brain.clear_context(message.from_user.id):
-        bot.reply_to(message, "🧹 Память очищена!")
+        bot.reply_to(message, "История диалога очищена")
     else:
-        bot.reply_to(message, "✅ Память чиста!")
+        bot.reply_to(message, "История уже пуста")
 
 @bot.message_handler(content_types=['photo'])
 def handle_photo(message):
@@ -70,7 +75,7 @@ def handle_photo(message):
         downloaded_file = bot.download_file(file_info.file_path)
         
         bot.send_chat_action(message.chat.id, 'typing')
-        status = bot.reply_to(message, "📸 Vision-нейросети анализируют фото...")
+        status = bot.reply_to(message, "Анализ фото...")
         
         analysis = brain.analyze_photo(downloaded_file, message.from_user.id)
         
@@ -78,7 +83,7 @@ def handle_photo(message):
         bot.reply_to(message, analysis)
         
     except Exception as e:
-        bot.reply_to(message, f"❌ Ошибка: {str(e)}")
+        bot.reply_to(message, f"Ошибка: {str(e)}")
 
 @bot.message_handler(func=lambda m: True)
 def handle_message(message):
@@ -88,23 +93,23 @@ def handle_message(message):
     if user_id in users:
         users[user_id]['messages'] += 1
     
-    # Кнопки
-    if user_text == '📸 Фото':
-        bot.send_message(message.chat.id, "📸 Отправь мне фото с примером!")
+    # Обработка кнопок
+    if user_text == '📷 Фото':
+        bot.reply_to(message, "Отправьте фото с примером для анализа")
         return
-    if user_text == '🧮 Пример':
-        bot.send_message(message.chat.id, "🧮 Например: `150 + 150 / 2`")
+    if user_text == '📝 Пример':
+        bot.reply_to(message, "Примеры запросов:\n• 150 + 150 / 2\n• cos 30°\n• x² - 5x + 6 = 0")
         return
     if user_text == '🎭 Шутка':
         user_text = "расскажи шутку"
-    if user_text == '🔍 Факт':
+    if user_text == '📊 Факт':
         user_text = "интересный факт"
     if user_text == '❓ Помощь':
         help_command(message)
         return
     
     bot.send_chat_action(message.chat.id, 'typing')
-    status = bot.reply_to(message, "🧠 Созываю ИИ-парламент из 20+ нейросетей...")
+    status = bot.reply_to(message, "Анализ запроса...")
     
     response = brain.get_response(user_id, user_text)
     
@@ -113,12 +118,12 @@ def handle_message(message):
 
 if __name__ == "__main__":
     print("=" * 80)
-    print("🤖 ИИ-ПАРЛАМЕНТ ИЗ 20+ НЕЙРОСЕТЕЙ ЗАПУЩЕН")
+    print("ЗАПУСК TELEGRAM БОТА")
     print("=" * 80)
     
     try:
         bot.polling(non_stop=True, interval=0, timeout=20)
     except Exception as e:
-        print(f"❌ Ошибка: {e}")
+        print(f"Ошибка: {e}")
         time.sleep(5)
         bot.polling(non_stop=True, interval=0, timeout=20)
