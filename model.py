@@ -1,5 +1,5 @@
 """
-🤖 СУПЕР-БОГ МАТЕМАТИКИ - ДИАГНОСТИЧЕСКАЯ ВЕРСИЯ
+🤖 СУПЕР-БОГ МАТЕМАТИКИ - ТЕСТОВАЯ ВЕРСИЯ
 """
 
 import os
@@ -24,55 +24,38 @@ import io
 class SuperGodAI:
     def __init__(self):
         print("=" * 60)
-        print("🔍 СУПЕР-ДИАГНОСТИКА ТОКЕНОВ")
+        print("🔧 ТЕСТОВАЯ ВЕРСИЯ - ТОКЕН В КОДЕ")
         print("=" * 60)
         
-        # Проверяем ВСЕ возможные переменные окружения
-        print("1️⃣ Проверяем переменные окружения:")
-        all_env = list(os.environ.keys())
-        print(f"   Всего переменных: {len(all_env)}")
+        # ⚠️⚠️⚠️ ВСТАВЬ СВОЙ ТОКЕН СЮДА ⚠️⚠️⚠️
+        # Токен должен начинаться с ghp_ и выглядеть примерно так:
+        # ghp_abc123def456ghi789jkl012mno345pqr678stu
+        self.github_token = "ghp_твой_токен_сюда"  # ← ЗАМЕНИ НА СВОЙ ТОКЕН!
         
-        # Проверяем GH_TOKEN
-        self.github_token = os.environ.get('GH_TOKEN')
-        if self.github_token:
-            print(f"2️⃣ ✅ GH_TOKEN НАЙДЕН!")
-            print(f"   Длина: {len(self.github_token)} символов")
-            print(f"   Начинается с: {self.github_token[:10]}...")
-            print(f"   Заканчивается на: ...{self.github_token[-5:]}")
-        else:
-            print("2️⃣ ❌ GH_TOKEN НЕ НАЙДЕН!")
+        print(f"1️⃣ Токен в коде: {'✅ ЕСТЬ' if self.github_token and self.github_token != 'ghp_твой_токен_сюда' else '❌ НЕТ'}")
+        
+        if self.github_token and self.github_token != "ghp_твой_токен_сюда":
+            print(f"2️⃣ Длина токена: {len(self.github_token)} символов")
+            print(f"3️⃣ Начинается с: {self.github_token[:10]}...")
+            print(f"4️⃣ Заканчивается на: ...{self.github_token[-5:]}")
             
-            # Проверяем другие возможные имена
-            print("3️⃣ Проверяем альтернативные имена:")
-            alt_names = ['GITHUB_TOKEN', 'OPENAI_API_KEY', 'TOKEN', 'API_KEY']
-            for name in alt_names:
-                val = os.environ.get(name)
-                if val:
-                    print(f"   • {name}: НАЙДЕН (длина {len(val)})")
-                else:
-                    print(f"   • {name}: не найден")
-        
-        print("=" * 60)
-        
-        # Подключаемся к GPT если есть токен
-        self.client = None
-        if self.github_token:
             try:
-                print("🔄 Подключаюсь к GPT-4o Vision...")
                 self.client = OpenAI(
                     base_url="https://models.inference.ai.azure.com",
                     api_key=self.github_token,
                     timeout=60.0
                 )
-                print("✅ GPT-4o Vision подключен успешно!")
+                print("✅ GPT-4o Vision ПОДКЛЮЧЕН!")
             except Exception as e:
                 print(f"❌ Ошибка подключения: {e}")
+                self.client = None
         else:
-            print("❌ GPT-4o Vision НЕ подключен - токена нет")
+            print("❌ Токен не вставлен или неправильный!")
+            self.client = None
         
         self.user_contexts = {}
         print("=" * 60)
-        print("🤖 СУПЕР-БОГ МАТЕМАТИКИ ЗАПУЩЕН")
+        print("🚀 Бот запущен")
         print("=" * 60)
     
     def analyze_photo_math(self, photo_bytes: bytes) -> str:
@@ -83,20 +66,14 @@ class SuperGodAI:
             return """❌ **Нет подключения к GPT-4o Vision**
 
 🔍 **ДИАГНОСТИКА:**
-• GH_TOKEN в коде: **НЕ НАЙДЕН**
+• Токен в коде: **НЕ КОРРЕКТЕН**
 
 📋 **ЧТО ДЕЛАТЬ:**
 
-1️⃣ **Проверь секреты GitHub:**
-   Settings → Secrets and variables → Actions
-   Там должен быть `GH_TOKEN` с твоим токеном
-
-2️⃣ **Проверь workflow файл:**
-   `.github/workflows/bot.yml`
-   Там должна быть строка:
-   `GH_TOKEN: ${{ secrets.GH_TOKEN }}`
-
-3️⃣ **Перезапусти Actions** после изменений
+1️⃣ Открой файл `model.py`
+2️⃣ Найди строку: `self.github_token = "ghp_твой_токен_сюда"`
+3️⃣ Вставь свой реальный токен вместо `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`
+4️⃣ Сохрани файл и перезапусти
 
 📝 **Пока пиши текстом:**
 • `1500+1500/2` = 2250
@@ -112,8 +89,9 @@ class SuperGodAI:
                     {
                         "role": "system",
                         "content": """Ты - СУПЕР-БОГ МАТЕМАТИКИ. Найди на фото все математические примеры и реши их!
-Если видишь дробь - реши её.
-Если видишь выражение - вычисли.
+Если видишь дробь 2/2 - ответь: 2/2 = 1
+Если видишь 1500+1500/2 - ответь: 1500+1500/2 = 2250
+Если видишь cos30 - ответь: cos30° = 0.866 (√3/2)
 Решай всё пошагово и подробно!"""
                     },
                     {
