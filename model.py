@@ -30,7 +30,7 @@ class SuperGodAI:
         # ⚠️⚠️⚠️ ВСТАВЬ СВОЙ ТОКЕН СЮДА ⚠️⚠️⚠️
         # Токен должен начинаться с ghp_ и выглядеть примерно так:
         # ghp_abc123def456ghi789jkl012mno345pqr678stu
-        self.github_token = "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"  # ← ЗАМЕНИ НА СВОЙ ТОКЕН!
+        self.github_token = "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"  # ← ЗАМЕНИ НА СВОЙ ТОКЕН!
         
         print(f"1️⃣ Токен в коде: {'✅ ЕСТЬ' if self.github_token and self.github_token != 'ghp_твой_токен_сюда' else '❌ НЕТ'}")
         
