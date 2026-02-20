@@ -1,190 +1,120 @@
 """
-Telegram бот с умной нейросетью
-Версия 3.0 - Понимает текст и фото
+Telegram бот с настоящим ИИ от GitHub
 """
 
 import os
 import telebot
 from telebot import types
 from model import brain
-import random
-from datetime import datetime
 
 # Токен из секретов GitHub
 TOKEN = os.environ.get('BOT_TOKEN')
 bot = telebot.TeleBot(TOKEN)
 
 # Статистика
-users_stats = {}
-bot_start_time = datetime.now()
+users = {}
 
 # ========== КОМАНДЫ ==========
 @bot.message_handler(commands=['start'])
 def start(message):
     """Приветствие"""
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    markup.row('💬 Поговорить', '📊 Статистика')
-    markup.row('📸 Прислать фото', '❓ Помощь')
+    markup.row('💬 Поговорить', '🧮 Математика')
+    markup.row('🎭 Шутка', '🔍 Факт')
+    markup.row('🔄 Очистить', '❓ Помощь')
     
     welcome = """
-🧠 **УМНАЯ НЕЙРОСЕТЬ v3.0**
+🌟 **НАСТОЯЩИЙ ИИ БОТ** 🌟
 
-Привет! Я нейросеть, которая:
-✅ Учится на каждом сообщении
-✅ Понимает фото
-✅ Помнит диалоги
-✅ Знает тысячи фраз
+Я использую **GPT-4o** от GitHub!
+Задавай любые вопросы:
 
-Просто напиши мне что-нибудь!
+📐 **Математика:** "реши x² - 5x + 6 = 0"
+💬 **Общение:** "Как дела?"
+🎭 **Шутки:** "Расскажи анекдот"
+🔍 **Факты:** "Интересный факт"
+
+Напиши мне что-нибудь!
     """
     
     bot.send_message(message.chat.id, welcome, reply_markup=markup, parse_mode='Markdown')
-    
-    # Обучаемся на приветствии
-    brain.train_on_message(f"Пользователь {message.from_user.first_name} начал диалог")
+    users[message.from_user.id] = {'name': message.from_user.first_name}
 
 @bot.message_handler(commands=['help'])
 def help_command(message):
-    """Помощь"""
-    help_text = f"""
-📚 **Доступные команды:**
-
-/start - Начать общение
-/help - Показать помощь
-/stats - Статистика нейросети
+    help_text = """
+📚 **Команды:**
+/start - Начать
+/help - Помощь
 /clear - Очистить память
+/math - Режим математики
 
-📸 **Функции:**
-• Отправь фото - я проанализирую
-• Напиши текст - я отвечу
-• Задавай любые вопросы
+💡 **Примеры:**
+• реши 2x + 5 = 15
+• найди производную x³
+• sin 30°
+• 1000 + 2300 = ?
 
-🧠 **Нейросеть:**
-• Словарь: {brain.words_count} слов
-• Нейронов: 512
+🎯 Просто пиши вопросы!
     """
-    
     bot.send_message(message.chat.id, help_text, parse_mode='Markdown')
-
-@bot.message_handler(commands=['stats'])
-def stats_command(message):
-    """Статистика"""
-    uptime = datetime.now() - bot_start_time
-    hours = uptime.seconds // 3600
-    minutes = (uptime.seconds // 60) % 60
-    
-    stats_text = f"""
-📊 **СТАТИСТИКА НЕЙРОСЕТИ**
-
-🧠 **Модель:**
-• Словарь: {brain.words_count} слов
-• Нейронов: 512
-• Память: {len(brain.long_term_memory)} диалогов
-
-📚 **Обучение:**
-• База знаний: {len(brain.knowledge_base)} фраз
-• Markov цепей: {len(brain.markov_chain)}
-
-⏱️ **Работа:**
-• Аптайм: {hours}ч {minutes}мин
-• Пользователей: {len(users_stats)}
-
-💡 **Статус:** Активен
-    """
-    
-    bot.send_message(message.chat.id, stats_text, parse_mode='Markdown')
 
 @bot.message_handler(commands=['clear'])
 def clear_command(message):
-    """Очистка памяти"""
+    """Очистка контекста"""
     user_id = message.from_user.id
-    if user_id in brain.user_memories:
-        del brain.user_memories[user_id]
-    brain.short_term_memory = []
-    bot.send_message(message.chat.id, "🧹 Память очищена! Начинаем с чистого листа.")
+    if brain.clear_context(user_id):
+        bot.send_message(message.chat.id, "🧹 Память очищена! Начинаем с чистого листа.")
+    else:
+        bot.send_message(message.chat.id, "✅ Память и так чиста!")
 
-# ========== ОБРАБОТКА ТЕКСТА ==========
+# ========== ОБРАБОТКА СООБЩЕНИЙ ==========
 @bot.message_handler(func=lambda m: True)
-def handle_text(message):
-    """Обработка всех текстовых сообщений"""
+def handle_message(message):
+    """Обработка всех сообщений"""
     
     user_id = message.from_user.id
     user_text = message.text
     
-    # Обновляем статистику
-    if user_id not in users_stats:
-        users_stats[user_id] = {'messages': 0, 'first_seen': datetime.now()}
-    users_stats[user_id]['messages'] += 1
-    
-    # ===== ОБРАБОТКА КНОПОК =====
+    # Обработка кнопок
     if user_text == '💬 Поговорить':
-        bot.send_message(message.chat.id, "👋 Отлично! Я слушаю... Напиши мне что-нибудь!")
+        bot.send_message(message.chat.id, "👋 Я слушаю! О чем поговорим?")
         return
     
-    if user_text == '📊 Статистика':
-        stats_command(message)
+    if user_text == '🧮 Математика':
+        bot.send_message(message.chat.id, "📐 Задавай любой пример! Например: 'реши x² - 5x + 6 = 0'")
         return
     
-    if user_text == '📸 Прислать фото':
-        bot.send_message(message.chat.id, "📸 Отправляй фото, я проанализирую!")
+    if user_text == '🎭 Шутка':
+        user_text = "Расскажи смешную шутку"
+    
+    if user_text == '🔍 Факт':
+        user_text = "Расскажи интересный факт"
+    
+    if user_text == '🔄 Очистить':
+        clear_command(message)
         return
     
     if user_text == '❓ Помощь':
         help_command(message)
         return
     
-    # ===== ЕСЛИ ЭТО НЕ КНОПКА - ОТВЕЧАЕМ! =====
-    
     # Показываем что бот печатает
     bot.send_chat_action(message.chat.id, 'typing')
     
-    # Генерируем ответ
-    response = brain.generate_response(user_text, user_id)
-    
-    # Добавляем эмодзи
-    emojis = ['😊', '🤔', '🌟', '💫', '✨', '🎯', '🚀', '💡']
-    if random.random() > 0.5 and not any(e in response for e in emojis):
-        response += ' ' + random.choice(emojis)
+    # Получаем ответ от настоящего ИИ
+    response = brain.get_response(user_id, user_text)
     
     # Отправляем ответ
     bot.reply_to(message, response)
-    
-    # Обучаемся на диалоге
-    brain.train_on_message(user_text, response)
-
-# ========== ОБРАБОТКА ФОТО ==========
-@bot.message_handler(content_types=['photo'])
-def handle_photo(message):
-    """Обработка фотографий"""
-    
-    # Получаем фото
-    file_id = message.photo[-1].file_id
-    file_info = bot.get_file(file_id)
-    downloaded_file = bot.download_file(file_info.file_path)
-    
-    # Показываем что бот думает
-    bot.send_chat_action(message.chat.id, 'typing')
-    
-    # Анализируем фото
-    analysis = brain.analyze_photo(downloaded_file)
-    
-    # Отправляем результат
-    bot.reply_to(message, f"📸 **Анализ фото:**\n\n{analysis}", parse_mode='Markdown')
-    
-    # Обучаемся
-    brain.train_on_message("[ФОТО]", analysis)
 
 # ========== ЗАПУСК ==========
 if __name__ == "__main__":
     print("=" * 50)
-    print("🧠 УМНЫЙ TELEGRAM БОТ v3.0")
+    print("🤖 TELEGRAM БОТ С НАСТОЯЩИМ ИИ")
     print("=" * 50)
-    print(f"📊 Статистика:")
-    print(f"   • Словарь: {brain.words_count} слов")
-    print(f"   • База знаний: {len(brain.knowledge_base)} фраз")
-    print(f"   • Нейронов: 512")
-    print("=" * 50)
-    print("✅ Бот запущен!")
+    print("Модель: GPT-4o от GitHub")
+    print("Статус: Запуск...")
     print("=" * 50)
     
     bot.infinity_polling()
