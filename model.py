@@ -1,308 +1,169 @@
 """
-🤖 ИИ-ПАРЛАМЕНТ — 20+ НЕЙРОСЕТЕЙ ОБДУМЫВАЮТ ОТВЕТ
-Выдаёт единый правильный ответ большинством голосов
-Фото анализирует через vision-модели
+АНАЛИТИЧЕСКАЯ СИСТЕМА — 20+ НЕЙРОСЕТЕЙ
+Высокая скорость, консенсус большинства, без эмодзи
 """
 
 import os
 import base64
 import requests
 import time
-import json
 from collections import Counter
 from datetime import datetime
 
 class SuperBot:
     def __init__(self):
         print("=" * 80)
-        print("🤖 ЗАПУСК ИИ-ПАРЛАМЕНТА — 20+ НЕЙРОСЕТЕЙ")
+        print("АНАЛИТИЧЕСКАЯ СИСТЕМА — 20+ НЕЙРОСЕТЕЙ")
         print("=" * 80)
         
         self.api_key = os.environ.get('OPENROUTER_KEY')
         
         if self.api_key:
-            print(f"✅ КЛЮЧ OPENROUTER НАЙДЕН! Длина: {len(self.api_key)}")
+            print(f"API КЛЮЧ: найден")
         else:
-            print("❌ КЛЮЧ OPENROUTER НЕ НАЙДЕН!")
-            print("   Добавь OPENROUTER_KEY в Secrets GitHub!")
+            print("ОШИБКА: ключ не найден")
         
-        # ⭐ 20+ ЛУЧШИХ БЕСПЛАТНЫХ МОДЕЛЕЙ (февраль 2026) ⭐
-        # На основе официальных данных OpenRouter [citation:1][citation:9]
+        # ⭐ 20+ МОДЕЛЕЙ С МИНИМАЛЬНЫМИ ТАЙМАУТАМИ ⭐
         self.models = [
-            # === УНИВЕРСАЛЬНЫЕ ФЛАГМАНЫ (GPT-4 уровня) ===
-            {
-                "name": "meta-llama/llama-3.3-70b-instruct:free",
-                "vision": False,
-                "speed": 0.8,
-                "desc": "Llama 3.3 70B (GPT-4 уровень)"
-            },
-            {
-                "name": "openai/gpt-oss-120b:free",
-                "vision": False,
-                "speed": 0.7,
-                "desc": "GPT-OSS 120B (открытая OpenAI)"
-            },
+            # Vision модели (для фото)
+            {"name": "google/gemini-2.0-flash-exp:free", "vision": True, "timeout": 5, "desc": "Gemini 2.0"},
+            {"name": "qwen/qwen3-vl-235b-a22b-thinking:free", "vision": True, "timeout": 7, "desc": "Qwen3 VL"},
+            {"name": "nvidia/nemotron-nano-2-vl:free", "vision": True, "timeout": 6, "desc": "NVIDIA VL"},
             
-            # === БЫСТРЫЕ FLASH-МОДЕЛИ ===
-            {
-                "name": "google/gemini-2.0-flash-exp:free",
-                "vision": True,
-                "speed": 0.95,
-                "desc": "Gemini 2.0 Flash (1M контекста, фото)"
-            },
-            {
-                "name": "stepfun/step-3.5-flash:free",
-                "vision": False,
-                "speed": 0.9,
-                "desc": "Step 3.5 Flash (256K, быстрая)"
-            },
-            {
-                "name": "z-ai/glm-4.5-air:free",
-                "vision": False,
-                "speed": 0.85,
-                "desc": "GLM-4.5-Air (быстрая, агенты)"
-            },
+            # Сверхбыстрые модели
+            {"name": "stepfun/step-3.5-flash:free", "vision": False, "timeout": 4, "desc": "Step 3.5"},
+            {"name": "z-ai/glm-4.5-air:free", "vision": False, "timeout": 5, "desc": "GLM-4.5"},
+            {"name": "arcee-ai/trinity-mini:free", "vision": False, "timeout": 4, "desc": "Trinity Mini"},
+            {"name": "liquidai/lfm2.5-1.2b-thinking:free", "vision": False, "timeout": 4, "desc": "LFM2.5"},
             
-            # === МОЩНЫЕ MoE-МОДЕЛИ ===
-            {
-                "name": "arcee-ai/trinity-large-preview:free",
-                "vision": False,
-                "speed": 0.7,
-                "desc": "Trinity Large (400B MoE)"
-            },
-            {
-                "name": "qwen/qwen3-235b-a22b-thinking:free",
-                "vision": False,
-                "speed": 0.6,
-                "desc": "Qwen3 235B (математика)"
-            },
-            
-            # === VISION-МОДЕЛИ (ПОНИМАЮТ ФОТО) ===
-            {
-                "name": "qwen/qwen3-vl-235b-a22b-thinking:free",
-                "vision": True,
-                "speed": 0.5,
-                "desc": "Qwen3 VL 235B (видео, фото)"
-            },
-            {
-                "name": "nvidia/nemotron-nano-2-vl:free",
-                "vision": True,
-                "speed": 0.75,
-                "desc": "NVIDIA Nemotron VL (OCR)"
-            },
-            {
-                "name": "moonshotai/kimi-vl-a3b-thinking:free",
-                "vision": True,
-                "speed": 0.8,
-                "desc": "Kimi VL A3B (лёгкая)"
-            },
-            
-            # === ЛЁГКИЕ БЫСТРЫЕ МОДЕЛИ ===
-            {
-                "name": "arcee-ai/trinity-mini:free",
-                "vision": False,
-                "speed": 0.95,
-                "desc": "Trinity Mini (очень быстрая)"
-            },
-            {
-                "name": "mistralai/devstral-2512:free",
-                "vision": False,
-                "speed": 0.85,
-                "desc": "Devstral 2 (кодинг)"
-            },
-            
-            # === ДОПОЛНИТЕЛЬНЫЕ МОДЕЛИ ===
-            {
-                "name": "deepseek/deepseek-r1:free",
-                "vision": False,
-                "speed": 0.6,
-                "desc": "DeepSeek R1 (логика)"
-            },
-            {
-                "name": "openrouter/aurora-alpha:free",
-                "vision": False,
-                "speed": 0.8,
-                "desc": "Aurora Alpha (кодинг)"
-            },
-            {
-                "name": "openrouter/pony-alpha:free",
-                "vision": False,
-                "speed": 0.75,
-                "desc": "Pony Alpha (GLM-5, агенты)"
-            },
-            {
-                "name": "upstage/solar-pro-3:free",
-                "vision": False,
-                "speed": 0.8,
-                "desc": "Solar Pro 3 (многоязычная)"
-            },
-            {
-                "name": "liquidai/lfm2.5-1.2b-thinking:free",
-                "vision": False,
-                "speed": 0.95,
-                "desc": "LFM2.5 (быстрая, логика)"
-            },
-            {
-                "name": "liquidai/lfm2.5-1.2b-instruct:free",
-                "vision": False,
-                "speed": 0.95,
-                "desc": "LFM2.5 Instruct (чат)"
-            },
-            {
-                "name": "nvidia/nemotron-3-nano-30b:free",
-                "vision": False,
-                "speed": 0.7,
-                "desc": "Nemotron 3 Nano (агенты)"
-            }
+            # Универсальные модели
+            {"name": "meta-llama/llama-3.3-70b-instruct:free", "vision": False, "timeout": 6, "desc": "Llama 3.3"},
+            {"name": "arcee-ai/trinity-large-preview:free", "vision": False, "timeout": 7, "desc": "Trinity Large"},
+            {"name": "qwen/qwen3-235b-a22b-thinking:free", "vision": False, "timeout": 7, "desc": "Qwen3"},
+            {"name": "openai/gpt-oss-120b:free", "vision": False, "timeout": 6, "desc": "GPT-OSS"},
+            {"name": "deepseek/deepseek-r1:free", "vision": False, "timeout": 7, "desc": "DeepSeek R1"},
+            {"name": "upstage/solar-pro-3:free", "vision": False, "timeout": 6, "desc": "Solar Pro"},
+            {"name": "mistralai/devstral-2512:free", "vision": False, "timeout": 6, "desc": "Devstral"},
+            {"name": "openrouter/aurora-alpha:free", "vision": False, "timeout": 6, "desc": "Aurora"},
+            {"name": "openrouter/pony-alpha:free", "vision": False, "timeout": 6, "desc": "Pony"},
+            {"name": "nvidia/nemotron-3-nano-30b:free", "vision": False, "timeout": 6, "desc": "Nemotron"},
+            {"name": "liquidai/lfm2.5-1.2b-instruct:free", "vision": False, "timeout": 5, "desc": "LFM Instruct"}
         ]
         
         self.vision_models = [m for m in self.models if m["vision"]]
-        
-        print(f"\n📊 ВСЕГО МОДЕЛЕЙ: {len(self.models)}")
-        print(f"📸 VISION-МОДЕЛЕЙ (для фото): {len(self.vision_models)}")
+        print(f"МОДЕЛЕЙ ЗАГРУЖЕНО: {len(self.models)}")
         print("=" * 80)
         
         self.user_contexts = {}
-        print("🚀 ИИ-ПАРЛАМЕНТ ГОТОВ К РАБОТЕ!")
+        print("СИСТЕМА ГОТОВА К РАБОТЕ")
         print("=" * 80)
     
-    def ask_model(self, model_config, messages, timeout=15):
-        """Спрашивает одну модель"""
+    def ask_model(self, model_config, messages):
+        """Быстрый запрос к одной модели"""
         try:
-            start = time.time()
-            
             response = requests.post(
                 url="https://openrouter.ai/api/v1/chat/completions",
                 headers={
                     "Authorization": f"Bearer {self.api_key}",
                     "Content-Type": "application/json",
-                    "HTTP-Referer": "https://github.com/",
                 },
                 json={
                     "model": model_config["name"],
                     "messages": messages,
-                    "temperature": 0.5,
-                    "max_tokens": 500,
+                    "temperature": 0.3,
+                    "max_tokens": 400,
                 },
-                timeout=timeout
+                timeout=model_config["timeout"]
             )
-            
-            elapsed = time.time() - start
             
             if response.status_code == 200:
                 result = response.json()
-                answer = result["choices"][0]["message"]["content"]
-                return {
-                    "success": True,
-                    "answer": answer,
-                    "time": elapsed,
-                    "model": model_config["desc"]
-                }
-            else:
-                return {"success": False, "answer": None}
-                
-        except Exception:
-            return {"success": False, "answer": None}
+                return result["choices"][0]["message"]["content"]
+            return None
+        except:
+            return None
     
-    def ensemble_vote(self, question, messages, is_photo=False):
-        """
-        ИИ-ПАРЛАМЕНТ: все модели голосуют, побеждает большинство
-        """
-        print(f"\n🗳️  СОЗЫВАЮ ИИ-ПАРЛАМЕНТ ИЗ {len(self.models)} НЕЙРОСЕТЕЙ...")
+    def analyze_responses(self, question, responses):
+        """Анализирует ответы и находит консенсус"""
+        if not responses:
+            return None
         
-        # Выбираем модели (для фото только vision)
-        models_to_use = self.vision_models if is_photo else self.models
+        if len(responses) == 1:
+            return responses[0]
         
-        # Собираем ответы
-        answers = []
-        successful = 0
-        
-        for i, model in enumerate(models_to_use, 1):
-            print(f"   {i}. {model['desc'][:30]}... ", end="")
-            result = self.ask_model(model, messages)
-            
-            if result["success"] and result["answer"]:
-                answers.append({
-                    "text": result["answer"][:200],  # для сравнения
-                    "full": result["answer"],
-                    "model": model["desc"]
-                })
-                successful += 1
-                print(f"✅ ({result['time']:.1f}с)")
-            else:
-                print("❌")
-            
-            time.sleep(0.3)  # небольшая пауза между запросами
-        
-        print(f"\n📊 ИТОГИ ГОЛОСОВАНИЯ:")
-        print(f"   • Участвовало: {len(models_to_use)} нейросетей")
-        print(f"   • Ответили: {successful}")
-        
-        if successful == 0:
-            return "❌ Ни одна нейросеть не ответила. Попробуй через минуту!"
-        
-        # === АНАЛИЗ КОНСЕНСУСА ===
-        # Сравниваем ответы и ищем общую суть [citation:6][citation:10]
-        
-        # Если ответила только одна модель
-        if successful == 1:
-            print(f"   • Консенсус: единогласное решение")
-            return f"{answers[0]['full']}\n\n_🧠 Решение одной нейросети_"
-        
-        # Собираем все ответы для финального анализа
-        all_answers = "\n\n---\n\n".join([
-            f"ОТВЕТ {i+1} ({a['model']}):\n{a['full']}" 
-            for i, a in enumerate(answers)
+        # Собираем ответы для анализа
+        answers_text = "\n\n".join([
+            f"Ответ {i+1}:\n{r}" for i, r in enumerate(responses)
         ])
         
-        # Просим главную модель проанализировать консенсус
-        consensus_prompt = f"""Вопрос: "{question}"
+        analysis_prompt = f"""Вопрос: {question}
 
-{all_answers}
+Получены следующие ответы от разных нейросетей:
+{answers_text}
 
-Проанализируй все ответы выше. Найди общую суть — то, с чем согласно большинство.
-Создай ОДИН ИТОГОВЫЙ ОТВЕТ, который отражает консенсус большинства нейросетей.
-Ответ должен быть точным и полным."""
+Проанализируй все ответы и сформируй единый итоговый ответ, который отражает общее мнение большинства. Ответ должен быть точным и полным."""
 
-        consensus_messages = [
-            {"role": "system", "content": "Ты — председатель ИИ-парламента. Найди консенсус большинства."},
-            {"role": "user", "content": consensus_prompt}
+        analysis_messages = [
+            {"role": "system", "content": "Ты анализируешь ответы нейросетей и находишь консенсус."},
+            {"role": "user", "content": analysis_prompt}
         ]
         
-        print(f"🔄 Анализирую консенсус {successful} нейросетей...")
-        
-        # Используем Gemini как председателя (самый быстрый)
-        chair_model = next(m for m in self.models if "gemini" in m["name"])
-        result = self.ask_model(chair_model, consensus_messages, timeout=20)
-        
-        if result["success"]:
-            final = result["answer"]
-        else:
-            # Если председатель не ответил, берём первый ответ
-            final = answers[0]["full"]
-        
-        # Добавляем информацию о голосовании
-        return f"{final}\n\n_🧠 {successful} нейросетей думали над ответом_"
+        # Используем Gemini как анализатор (самый быстрый)
+        gemini = next(m for m in self.models if "gemini" in m["name"])
+        return self.ask_model(gemini, analysis_messages) or responses[0]
     
     def get_response(self, user_id, message):
-        """Основной метод для текстовых запросов"""
+        """Получение ответа от системы"""
         
         if not self.api_key:
-            return "❌ Нет ключа OpenRouter. Добавь OPENROUTER_KEY в секреты!"
+            return "Ошибка: не найден API ключ OpenRouter"
         
-        # Системный промпт
+        # Системный промпт для всех моделей
+        system_prompt = "Ты — аналитическая нейросеть. Отвечай кратко и точно. Приоритет операций: сначала умножение/деление, затем сложение/вычитание."
+        
         messages = [
-            {"role": "system", "content": "Ты — нейросеть в парламенте. Отвечай кратко и точно."},
+            {"role": "system", "content": system_prompt},
             {"role": "user", "content": message}
         ]
         
-        return self.ensemble_vote(message, messages, is_photo=False)
+        print(f"\nЗАПРОС: {message[:50]}...")
+        print(f"ОПРОС {len(self.models)} МОДЕЛЕЙ...")
+        
+        # Собираем ответы (максимум 8-10 самых быстрых)
+        responses = []
+        models_tested = 0
+        models_responded = 0
+        
+        for i, model in enumerate(self.models[:10]):  # Первые 10 самых быстрых
+            print(f"  {i+1}. {model['desc']}...", end="")
+            answer = self.ask_model(model, messages)
+            models_tested += 1
+            if answer:
+                responses.append(answer)
+                models_responded += 1
+                print(f" OK")
+            else:
+                print(f" нет")
+            time.sleep(0.1)  # Минимальная пауза
+        
+        print(f"\nИТОГ: опрошено {models_tested}, ответили {models_responded}")
+        
+        if not responses:
+            return "Ошибка: ни одна нейросеть не ответила"
+        
+        # Анализируем консенсус
+        final_answer = self.analyze_responses(message, responses)
+        
+        if models_responded > 1:
+            return f"{final_answer}\n\n*Проанализировано {models_responded} нейросетями*"
+        else:
+            return final_answer
     
     def analyze_photo(self, photo_bytes, user_id):
-        """Анализирует фото (только vision-модели)"""
+        """Анализ фотографии (только vision-модели)"""
         
         if not self.api_key:
-            return "❌ Нет ключа OpenRouter. Добавь OPENROUTER_KEY в секреты!"
+            return "Ошибка: не найден API ключ OpenRouter"
         
         try:
             base64_image = base64.b64encode(photo_bytes).decode('utf-8')
@@ -310,7 +171,7 @@ class SuperBot:
             messages = [
                 {
                     "role": "system",
-                    "content": "Ты — нейросеть с vision. Найди на фото все математические примеры и реши их."
+                    "content": "Найди на фото все математические примеры и реши их. Приоритет операций: умножение/деление перед сложением/вычитанием."
                 },
                 {
                     "role": "user",
@@ -325,10 +186,21 @@ class SuperBot:
                 }
             ]
             
-            return self.ensemble_vote("Анализ фото", messages, is_photo=True)
+            print(f"\nАНАЛИЗ ФОТО: {len(self.vision_models)} vision-моделей")
+            
+            # Пробуем vision-модели
+            for model in self.vision_models[:3]:  # Первые 3 vision
+                print(f"  {model['desc']}...", end="")
+                answer = self.ask_model(model, messages)
+                if answer:
+                    print(f" OK")
+                    return answer
+                print(f" нет")
+            
+            return "Не удалось проанализировать фото"
             
         except Exception as e:
-            return f"❌ Ошибка: {str(e)}"
+            return f"Ошибка анализа: {str(e)}"
     
     def clear_context(self, user_id):
         if user_id in self.user_contexts:
