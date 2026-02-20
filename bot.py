@@ -67,43 +67,54 @@ def help_command(message):
     
     bot.send_message(message.chat.id, help_text, parse_mode='Markdown')
 
-@bot.message_handler(commands=['stats'])
-def stats_command(message):
-    """Статистика"""
-    uptime = datetime.now() - bot_start_time
-    hours = uptime.seconds // 3600
-    minutes = (uptime.seconds // 60) % 60
+@bot.message_handler(func=lambda m: True)
+def handle_text(message):
+    """Обработка всех текстовых сообщений"""
     
-    stats_text = f"""
-📊 **СТАТИСТИКА НЕЙРОСЕТИ**
-
-🧠 **Модель:**
-• Словарь: {brain.words_count} слов
-• Нейронов: 512
-• Память: {len(brain.long_term_memory)} диалогов
-
-📚 **Обучение:**
-• База знаний: {len(brain.knowledge_base)} фраз
-• Markov цепей: {len(brain.markov_chain)}
-
-⏱️ **Работа:**
-• Аптайм: {hours}ч {minutes}мин
-• Пользователей: {len(users_stats)}
-
-💡 **Статус:** Активен
-    """
-    
-    bot.send_message(message.chat.id, stats_text, parse_mode='Markdown')
-
-@bot.message_handler(commands=['clear'])
-def clear_command(message):
-    """Очистка памяти"""
     user_id = message.from_user.id
-    if user_id in brain.user_memories:
-        del brain.user_memories[user_id]
-    brain.short_term_memory = []
-    bot.send_message(message.chat.id, "🧹 Память очищена! Начинаем с чистого листа.")
-
+    user_text = message.text
+    
+    # Обновляем статистику
+    if user_id not in users_stats:
+        users_stats[user_id] = {'messages': 0, 'first_seen': datetime.now()}
+    users_stats[user_id]['messages'] += 1
+    
+    # ===== ОБРАБОТКА КНОПОК =====
+    if user_text == '💬 Поговорить':
+        bot.send_message(message.chat.id, "👋 Отлично! Я слушаю... Напиши мне что-нибудь!")
+        return  # Выходим, чтобы не генерировать ответ на саму кнопку
+    
+    if user_text == '📊 Статистика':
+        stats_command(message)
+        return
+    
+    if user_text == '📸 Прислать фото':
+        bot.send_message(message.chat.id, "📸 Отправляй фото, я проанализирую!")
+        return
+    
+    if user_text == '❓ Помощь':
+        help_command(message)
+        return
+    
+    # ===== ЕСЛИ ЭТО НЕ КНОПКА - ОТВЕЧАЕМ! =====
+    
+    # Показываем что бот печатает
+    bot.send_chat_action(message.chat.id, 'typing')
+    
+    # Генерируем ответ
+    response = brain.generate_response(user_text, user_id)
+    
+    # Добавляем эмодзи
+    emojis = ['😊', '🤔', '🌟', '💫', '✨', '🎯', '🚀', '💡']
+    if random.random() > 0.5 and not any(e in response for e in emojis):
+        response += ' ' + random.choice(emojis)
+    
+    # Отправляем ответ
+    bot.reply_to(message, response)
+    
+    # Обучаемся на диалоге
+    brain.train_on_message(user_text, response)
+    
 # ========== ОБРАБОТКА ФОТО ==========
 @bot.message_handler(content_types=['photo'])
 def handle_photo(message):
