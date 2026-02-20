@@ -1,6 +1,6 @@
 """
-🤖 TELEGRAM БОТ С АБСОЛЮТНЫМ ИИ
-Версия 20.0 - Мировой уровень
+🤖 TELEGRAM БОТ - СУПЕР-БОГ МАТЕМАТИКИ
+Версия 30.0 - Понимает фото, решает любые примеры
 """
 
 import os
@@ -21,37 +21,28 @@ bot_start = datetime.now()
 # ========== КОМАНДЫ ==========
 @bot.message_handler(commands=['start'])
 def start(message):
-    """Идеальное приветствие"""
+    """Приветствие"""
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    markup.row('💬 Общение', '📐 Математика', '📏 Геометрия')
-    markup.row('🎭 Шутка', '🔍 Факт', '💭 Цитата')
-    markup.row('📸 Фото', '🔄 Очистить', '📊 Статистика')
-    markup.row('❓ Помощь', 'ℹ️ О боте')
+    markup.row('📸 Отправить фото', '🧮 Решить пример')
+    markup.row('🎭 Шутка', '🔍 Факт', '❓ Помощь')
+    markup.row('📊 Статистика', '🔄 Очистить', 'ℹ️ О боте')
     
     welcome = """
-🌟 **АБСОЛЮТНЫЙ ИИ БОТ - УРОВЕНЬ БОГА** 🌟
-**Версия 20.0 - Умнее ChatGPT и DeepSeek**
+🌟 **СУПЕР-БОГ МАТЕМАТИКИ** 🌟
+**Версия 30.0 - Умнее ChatGPT-5 и DeepSeek-V3**
 
-Я знаю **ВСЮ МАТЕМАТИКУ** в мире!
-Моя база знаний: **10,000,000+ ответов**! 🚀
+📸 **ОТПРАВЬ ФОТО С ПРИМЕРОМ - Я РЕШУ!**
+🧮 **ПОНИМАЮ ЛЮБЫЕ ПРИМЕРЫ:** 1500+1500/2, cos30, x²-5x+6=0
 
 📌 **Что я умею:**
-• Решать любые уравнения (x² - 5x + 6 = 0 → x=2, x=3)
-• Считать производные и интегралы
-• Знаю всю геометрию (теорема Пифагора)
-• Понимаю тригонометрию (sin 30° = 0.5)
-• Отвечаю на любые вопросы
-• Рассказываю шутки и факты
+• Решать примеры с фото
+• Арифметика: 1500+1500/2 = 2250
+• Тригонометрия: cos30° = 0.866
+• Уравнения: x²-5x+6=0 → x=2, x=3
+• Производные и интегралы
+• Шутить и общаться
 
-📝 **Примеры запросов:**
-• `реши x² - 5x + 6 = 0`
-• `теорема Пифагора`
-• `расскажи шутку`
-• `cos30`
-• `100+200`
-• `sin 45°`
-
-**Просто напиши мне что-нибудь!** 😊
+**ПРОСТО ОТПРАВЬ ФОТО ИЛИ НАПИШИ ПРИМЕР!** 🚀
     """
     
     bot.send_message(message.chat.id, welcome, reply_markup=markup, parse_mode='Markdown')
@@ -68,20 +59,19 @@ def help_command(message):
     help_text = """
 📚 **КОМАНДЫ И ВОЗМОЖНОСТИ:**
 
-🔢 **МАТЕМАТИКА:**
-• Уравнения: `реши x + 5 = 10`
-• Квадратные: `x² - 5x + 6 = 0`
-• Производные: `найди производную x³`
-• Интегралы: `найди интеграл x² dx`
-• Тригонометрия: `cos30`, `sin45`
-• Простая арифметика: `100+200`, `1000-500`
+📸 **ФОТО:**
+• Отправь фото с примером - я решу!
+• Понимаю рукописный текст
+• Вижу уравнения и формулы
 
-📐 **ГЕОМЕТРИЯ:**
-• `теорема Пифагора`
-• `площадь круга`
-• `объем шара`
+🧮 **ПРИМЕРЫ (ПИШИ ЛЮБЫЕ):**
+• `1500+1500/2` → 2250
+• `cos30` → 0.866
+• `sin45` → 0.707
+• `x+5=10` → x=5
+• `x²-5x+6=0` → x=2, x=3
 
-💬 **ОБЩЕНИЕ:**
+🎭 **ОБЩЕНИЕ:**
 • `привет`, `как дела`
 • `расскажи шутку`
 • `интересный факт`
@@ -92,9 +82,8 @@ def help_command(message):
 /help - Помощь
 /clear - Очистить память
 /stats - Статистика
-/about - О боте
 
-🎯 **ПРОСТО ПИШИ - Я ОТВЕЧУ НА ЛЮБОЙ ВОПРОС!**
+🎯 **ПРОСТО ПИШИ ИЛИ ОТПРАВЛЯЙ ФОТО!**
     """
     bot.send_message(message.chat.id, help_text, parse_mode='Markdown')
 
@@ -119,16 +108,16 @@ def stats_command(message):
 🤖 **Бот:**
 • Статус: Активен
 • Аптайм: {hours}ч {minutes}мин
-• Версия: 20.0 (Уровень Бога)
+• Версия: 30.0 (СУПЕР-БОГ)
 
 👥 **Пользователи:**
 • Всего: {len(users)}
 • Сообщений: {sum(u['messages'] for u in users.values())}
 
 🧠 **ИИ:**
-• Модель: GPT-4o + Собственные знания
-• Знаний: 10,000,000+ ответов
-• Уровень: Умнее ChatGPT и DeepSeek
+• Модель: GPT-4o Vision
+• Уровень: ChatGPT-5 + DeepSeek-V3
+• Понимает: Фото, математику, общение
 
 💡 **Работает 24/7 на GitHub!**
     """
@@ -138,52 +127,65 @@ def stats_command(message):
 def about_command(message):
     """О боте"""
     about = """
-🧠 **ОБ АБСОЛЮТНОМ ИИ**
+🧠 **О СУПЕР-БОГЕ МАТЕМАТИКИ**
 
-**Версия:** 20.0 (Уровень Бога)
+**Версия:** 30.0 (Уровень ChatGPT-5)
 
-📚 **ГИГАНТСКАЯ БАЗА ЗНАНИЙ:**
-• Математика: 1,000,000+ формул
-• Алгебра: 1,000,000+ уравнений
-• Геометрия: 1,000,000+ теорем
-• Тригонометрия: 1,000,000+ значений
-• Матанализ: 1,000,000+ операций
-• Общение: 1,000,000+ фраз
-• Шутки: 10,000+ шуток
-• Факты: 10,000+ фактов
+📸 **ГЛАВНАЯ ФИШКА:**
+• Понимает математику на фото!
+• Решает рукописные примеры!
+• Видит уравнения и формулы!
+
+🧮 **ЧТО РЕШАЕТ:**
+• Арифметика: 1500+1500/2
+• Тригонометрия: cos30°, sin45°
+• Уравнения: x²-5x+6=0
+• Производные и интегралы
 
 🚀 **Технологии:**
-• GPT-4o от GitHub Models
+• GPT-4o Vision от GitHub
 • SymPy для математики
 • Telegram Bot API
 
 💰 **Цена:** АБСОЛЮТНО БЕСПЛАТНО!
 
-🌟 **Просто наслаждайся общением!**
+🌟 **Отправляй фото и получай решения!**
     """
     bot.send_message(message.chat.id, about, parse_mode='Markdown')
 
 # ========== ОБРАБОТКА ФОТО ==========
 @bot.message_handler(content_types=['photo'])
 def handle_photo(message):
-    """Обработка фотографий"""
+    """Обработка фотографий - ГЛАВНАЯ ФИШКА!"""
     
     try:
+        # Получаем фото
         file_id = message.photo[-1].file_id
         file_info = bot.get_file(file_id)
         downloaded_file = bot.download_file(file_info.file_path)
         
+        # Показываем что бот думает
         bot.send_chat_action(message.chat.id, 'typing')
         
-        analysis = brain.analyze_photo(downloaded_file)
-        bot.reply_to(message, analysis)
+        # Отправляем уведомление
+        status_msg = bot.reply_to(message, "📸 Анализирую фото... Секунду!")
+        
+        # Анализируем фото через GPT-4o Vision
+        analysis = brain.analyze_photo_math(downloaded_file)
+        
+        # Удаляем статусное сообщение
+        bot.delete_message(message.chat.id, status_msg.message_id)
+        
+        # Отправляем результат
+        bot.reply_to(message, f"📸 **РЕШЕНИЕ ПО ФОТО:**\n\n{analysis}")
+        
     except Exception as e:
-        bot.reply_to(message, f"❌ Ошибка при обработке фото: {str(e)}")
+        bot.reply_to(message, f"❌ Ошибка при обработке фото: {str(e)}\n\nПопробуй написать пример текстом!")
 
 # ========== ОБРАБОТКА СООБЩЕНИЙ ==========
 @bot.message_handler(func=lambda m: True)
 def handle_message(message):
-    """Обработка всех сообщений"""
+    """Обработка всех текстовых сообщений"""
     
     user_id = message.from_user.id
     user_text = message.text
@@ -192,16 +194,12 @@ def handle_message(message):
         users[user_id]['messages'] += 1
     
     # Обработка кнопок
-    if user_text == '💬 Общение':
-        bot.send_message(message.chat.id, "💬 Я слушаю! О чем поговорим? Задавай любые вопросы!")
+    if user_text == '📸 Отправить фото':
+        bot.send_message(message.chat.id, "📸 Отправь мне фото с примером, и я решу его! Это моя супер-способность!")
         return
     
-    if user_text == '📐 Математика':
-        bot.send_message(message.chat.id, "📐 Задавай любой пример!\n\nНапример:\n• реши x² - 5x + 6 = 0\n• 100+200\n• cos30\n• sin45")
-        return
-    
-    if user_text == '📏 Геометрия':
-        bot.send_message(message.chat.id, "📏 Спрашивай про геометрию!\n\nНапример:\n• теорема Пифагора\n• площадь круга\n• объем шара")
+    if user_text == '🧮 Решить пример':
+        bot.send_message(message.chat.id, "🧮 Напиши любой пример!\n\nНапример:\n• `1500+1500/2`\n• `cos30`\n• `x²-5x+6=0`\n• `sin45`")
         return
     
     if user_text == '🎭 Шутка':
@@ -210,23 +208,16 @@ def handle_message(message):
     if user_text == '🔍 Факт':
         user_text = "интересный факт"
     
-    if user_text == '💭 Цитата':
-        user_text = "мудрая цитата"
-    
-    if user_text == '📸 Фото':
-        bot.send_message(message.chat.id, "📸 Отправь мне фото, и я проанализирую его!")
-        return
-    
-    if user_text == '🔄 Очистить':
-        clear_command(message)
+    if user_text == '❓ Помощь':
+        help_command(message)
         return
     
     if user_text == '📊 Статистика':
         stats_command(message)
         return
     
-    if user_text == '❓ Помощь':
-        help_command(message)
+    if user_text == '🔄 Очистить':
+        clear_command(message)
         return
     
     if user_text == 'ℹ️ О боте':
@@ -236,7 +227,7 @@ def handle_message(message):
     # Показываем что бот печатает
     bot.send_chat_action(message.chat.id, 'typing')
     
-    # Получаем ответ от АБСОЛЮТНОГО ИИ
+    # Получаем ответ от СУПЕР-БОГА
     response = brain.get_response(user_id, user_text)
     
     # Отправляем ответ
@@ -245,16 +236,13 @@ def handle_message(message):
 # ========== ЗАПУСК ==========
 if __name__ == "__main__":
     print("=" * 80)
-    print("🤖 АБСОЛЮТНЫЙ TELEGRAM БОТ v20.0 - УРОВЕНЬ БОГА")
+    print("🤖 СУПЕР-БОГ МАТЕМАТИКИ v30.0 - УРОВЕНЬ ChatGPT-5")
     print("=" * 80)
-    print("🧠 Уровень: Умнее ChatGPT и DeepSeek")
-    print("📚 Знаний: 10,000,000+ ответов")
-    print("📐 Математика: Полная")
-    print("📏 Геометрия: Полная")
-    print("💬 Общение: Идеальное")
-    print("📸 Фото: Анализ")
+    print("📸 Понимает фото с примерами!")
+    print("🧮 Решает: 1500+1500/2, cos30, x²-5x+6=0")
+    print("💬 Общается как человек")
     print("=" * 80)
-    print("🚀 БОТ ЗАПУЩЕН - ОТВЕЧАЕТ НА ЛЮБЫЕ ВОПРОСЫ!")
+    print("🚀 БОТ ЗАПУЩЕН - ОТПРАВЛЯЙ ФОТО!")
     print("=" * 80)
     
     bot.infinity_polling()
