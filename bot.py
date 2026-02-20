@@ -1,55 +1,190 @@
+"""
+Telegram бот с умной нейросетью
+Версия 3.0 - Понимает текст и фото
+"""
+
 import os
 import telebot
-import sys
+from telebot import types
+from model import brain
+import time
+from datetime import datetime
 
-# ========== ПРОВЕРКА ТОКЕНА ==========
-print("🔍 ДИАГНОСТИКА ТОКЕНА")
-print("-" * 50)
+# Токен из секретов GitHub
+TOKEN = os.environ.get('BOT_TOKEN')
+bot = telebot.TeleBot(TOKEN)
 
-# Проверяем переменные окружения
-print(f"1. Все переменные окружения: {list(os.environ.keys())}")
+# Статистика
+users_stats = {}
+bot_start_time = datetime.now()
 
-# Проверяем BOT_TOKEN
-token = os.environ.get('BOT_TOKEN')
-print(f"2. BOT_TOKEN получен: {'✅ ДА' if token else '❌ НЕТ'}")
-
-if token:
-    print(f"3. Длина токена: {len(token)} символов")
-    print(f"4. Первые 10 символов: {token[:10]}...")
-    print(f"5. Последние 5 символов: ...{token[-5:]}")
+# ========== КОМАНДЫ ==========
+@bot.message_handler(commands=['start'])
+def start(message):
+    """Приветствие"""
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    markup.row('💬 Поговорить', '📊 Статистика')
+    markup.row('📸 Прислать фото', '❓ Помощь')
     
-    # Проверяем формат токена
-    if ':' in token:
-        parts = token.split(':')
-        print(f"6. Формат токена: ✅ КОРРЕКТНЫЙ (есть двоеточие)")
-        print(f"7. ID бота: {parts[0]}")
-    else:
-        print(f"6. Формат токена: ❌ НЕКОРРЕКТНЫЙ (нет двоеточия!)")
-else:
-    print("❌ ТОКЕН НЕ НАЙДЕН В ПЕРЕМЕННЫХ ОКРУЖЕНИЯ!")
-    sys.exit(1)
+    welcome = """
+🧠 **УМНАЯ НЕЙРОСЕТЬ v3.0**
 
-print("-" * 50)
+Привет! Я нейросеть, которая:
+✅ Учится на каждом сообщении
+✅ Понимает фото
+✅ Помнит диалоги
+✅ Знает тысячи фраз
 
-# ========== ПОДКЛЮЧЕНИЕ К TELEGRAM ==========
-print("🚀 Пробуем подключиться к Telegram...")
+Просто напиши мне что-нибудь!
+    """
+    
+    bot.send_message(message.chat.id, welcome, reply_markup=markup, parse_mode='Markdown')
+    
+    # Обучаемся на приветствии
+    brain.train_on_message(f"Пользователь {message.from_user.first_name} начал диалог")
 
-try:
-    bot = telebot.TeleBot(token)
-    me = bot.get_me()
-    print(f"✅ УСПЕХ! Бот @{me.username} (ID: {me.id}) подключен!")
+@bot.message_handler(commands=['help'])
+def help_command(message):
+    """Помощь"""
+    help_text = """
+📚 **Доступные команды:**
+
+/start - Начать общение
+/help - Показать помощь
+/stats - Статистика нейросети
+/clear - Очистить память
+/photo - Анализ фото
+
+📸 **Функции:**
+• Отправь фото - я проанализирую
+• Напиши текст - я отвечу
+• Задавай любые вопросы
+
+🧠 **Нейросеть:**
+• Словарь: {} слов
+• Нейронов: 512
+    """.format(brain.words_count)
     
-    @bot.message_handler(commands=['start'])
-    def start(message):
-        bot.reply_to(message, "✅ Бот работает! Токен правильный!")
+    bot.send_message(message.chat.id, help_text, parse_mode='Markdown')
+
+@bot.message_handler(commands=['stats'])
+def stats_command(message):
+    """Статистика"""
+    uptime = datetime.now() - bot_start_time
+    hours = uptime.seconds // 3600
+    minutes = (uptime.seconds // 60) % 60
     
-    @bot.message_handler(func=lambda m: True)
-    def echo(message):
-        bot.reply_to(message, f"Ты написал: {message.text}")
+    stats_text = f"""
+📊 **СТАТИСТИКА НЕЙРОСЕТИ**
+
+🧠 **Модель:**
+• Словарь: {brain.words_count} слов
+• Нейронов: 512
+• Память: {len(brain.long_term_memory)} диалогов
+
+📚 **Обучение:**
+• База знаний: {len(brain.knowledge_base)} фраз
+• Markov цепей: {len(brain.markov_chain)}
+
+⏱️ **Работа:**
+• Аптайм: {hours}ч {minutes}мин
+• Пользователей: {len(users_stats)}
+
+💡 **Статус:** Активен
+    """
     
-    print("🔄 Бот запускает polling...")
+    bot.send_message(message.chat.id, stats_text, parse_mode='Markdown')
+
+@bot.message_handler(commands=['clear'])
+def clear_command(message):
+    """Очистка памяти"""
+    user_id = message.from_user.id
+    if user_id in brain.user_memories:
+        del brain.user_memories[user_id]
+    brain.short_term_memory = []
+    bot.send_message(message.chat.id, "🧹 Память очищена! Начинаем с чистого листа.")
+
+# ========== ОБРАБОТКА ФОТО ==========
+@bot.message_handler(content_types=['photo'])
+def handle_photo(message):
+    """Обработка фотографий"""
+    
+    # Получаем фото
+    file_id = message.photo[-1].file_id
+    file_info = bot.get_file(file_id)
+    downloaded_file = bot.download_file(file_info.file_path)
+    
+    # Показываем что бот думает
+    bot.send_chat_action(message.chat.id, 'typing')
+    
+    # Анализируем фото
+    analysis = brain.analyze_photo(downloaded_file)
+    
+    # Отправляем результат
+    bot.reply_to(message, f"📸 **Анализ фото:**\n\n{analysis}", parse_mode='Markdown')
+    
+    # Обучаемся
+    brain.train_on_message("[ФОТО]", analysis)
+
+# ========== ОБРАБОТКА ТЕКСТА ==========
+@bot.message_handler(func=lambda m: True)
+def handle_text(message):
+    """Обработка всех текстовых сообщений"""
+    
+    user_id = message.from_user.id
+    user_text = message.text
+    
+    # Обновляем статистику
+    if user_id not in users_stats:
+        users_stats[user_id] = {'messages': 0, 'first_seen': datetime.now()}
+    users_stats[user_id]['messages'] += 1
+    
+    # Обработка кнопок
+    if user_text == '💬 Поговорить':
+        bot.send_message(message.chat.id, "👋 Отлично! Я слушаю...")
+        return
+    elif user_text == '📊 Статистика':
+        stats_command(message)
+        return
+    elif user_text == '📸 Прислать фото':
+        bot.send_message(message.chat.id, "📸 Отправляй фото, я проанализирую!")
+        return
+    elif user_text == '❓ Помощь':
+        help_command(message)
+        return
+    
+    # Показываем что бот печатает
+    bot.send_chat_action(message.chat.id, 'typing')
+    
+    # Генерируем ответ
+    response = brain.generate_response(user_text, user_id)
+    
+    # Добавляем эмодзи
+    emojis = ['😊', '🤔', '🌟', '💫', '✨', '🎯', '🚀', '💡']
+    if random.random() > 0.5 and not any(e in response for e in emojis):
+        response += ' ' + random.choice(emojis)
+    
+    # Отправляем ответ
+    bot.reply_to(message, response)
+    
+    # Обучаемся на диалоге
+    brain.train_on_message(user_text, response)
+    
+    # Автосохранение каждые 10 сообщений
+    if users_stats[user_id]['messages'] % 10 == 0:
+        print(f"💾 Автосохранение для пользователя {user_id}")
+
+# ========== ЗАПУСК ==========
+if __name__ == "__main__":
+    print("=" * 50)
+    print("🧠 УМНЫЙ TELEGRAM БОТ v3.0")
+    print("=" * 50)
+    print(f"📊 Статистика:")
+    print(f"   • Словарь: {brain.words_count} слов")
+    print(f"   • База знаний: {len(brain.knowledge_base)} фраз")
+    print(f"   • Нейронов: 512")
+    print("=" * 50)
+    print("✅ Бот запущен!")
+    print("=" * 50)
+    
     bot.infinity_polling()
-    
-except Exception as e:
-    print(f"❌ ОШИБКА ПОДКЛЮЧЕНИЯ: {e}")
-    print(f"Тип ошибки: {type(e).__name__}")
