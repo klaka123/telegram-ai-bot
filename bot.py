@@ -1,5 +1,5 @@
 """
-🤖 TELEGRAM БОТ — ТРИ БЫСТРЫЕ НЕЙРОСЕТИ
+🤖 TELEGRAM БОТ — ИИ-ПАРЛАМЕНТ ИЗ 20+ НЕЙРОСЕТЕЙ
 """
 
 import os
@@ -18,27 +18,21 @@ bot_start = datetime.now()
 @bot.message_handler(commands=['start'])
 def start(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    markup.row('📸 Отправить фото', '🧮 Пример')
+    markup.row('📸 Фото', '🧮 Пример')
     markup.row('🎭 Шутка', '🔍 Факт', '❓ Помощь')
     
     welcome = """
-🌟 **ТРИ БЫСТРЫЕ НЕЙРОСЕТИ** 🌟
-**Gemini 2.0 Flash + Trinity Large + Step 3.5 Flash**
+🌟 **ИИ-ПАРЛАМЕНТ — 20+ НЕЙРОСЕТЕЙ** 🌟
 
-⚡ **СУПЕР-СКОРОСТЬ:**
-• Gemini 2.0 Flash (1 млн контекста)
-• Trinity Large (100% uptime)
-• Step 3.5 Flash (молниеносная)
+🧠 **КАК ЭТО РАБОТАЕТ:**
+• 20+ нейросетей одновременно думают над вопросом
+• Подсчитывается ответ большинства
+• Выдаётся ЕДИНСТВЕННО ПРАВИЛЬНЫЙ ОТВЕТ
 
-📸 **ОТПРАВЛЯЙ ФОТО — РЕШУ ЗА СЕКУНДЫ!**
-🧮 **ПРАВИЛЬНО СЧИТАЮ:** 150+150/2 = 225 (сначала деление)
+📸 **ФОТО:** отправляй — проанализируют vision-модели
+🧮 **ПРИМЕР:** 150 + 150 / 2 = 225
 
-📝 **ПРИМЕРЫ:**
-• `150 + 150 / 2`
-• `cos30`
-• `x² - 5x + 6 = 0`
-
-**ТРИ МОЗГА РАБОТАЮТ БЫСТРЕЕ ОДНОГО!** 🚀
+📝 **ПРОСТО НАПИШИ МНЕ!**
     """
     
     bot.send_message(message.chat.id, welcome, reply_markup=markup, parse_mode='Markdown')
@@ -57,7 +51,7 @@ def help_command(message):
 🎭 **Шутка:** расскажи шутку
 🔍 **Факт:** интересный факт
 
-**⚡ Три быстрые нейросети отвечают за секунды!**
+**🧠 20+ нейросетей думают над каждым ответом!**
     """
     bot.reply_to(message, help_text)
 
@@ -76,7 +70,7 @@ def handle_photo(message):
         downloaded_file = bot.download_file(file_info.file_path)
         
         bot.send_chat_action(message.chat.id, 'typing')
-        status = bot.reply_to(message, "📸 Три быстрые нейросети анализируют фото...")
+        status = bot.reply_to(message, "📸 Vision-нейросети анализируют фото...")
         
         analysis = brain.analyze_photo(downloaded_file, message.from_user.id)
         
@@ -95,7 +89,7 @@ def handle_message(message):
         users[user_id]['messages'] += 1
     
     # Кнопки
-    if user_text == '📸 Отправить фото':
+    if user_text == '📸 Фото':
         bot.send_message(message.chat.id, "📸 Отправь мне фото с примером!")
         return
     if user_text == '🧮 Пример':
@@ -110,7 +104,7 @@ def handle_message(message):
         return
     
     bot.send_chat_action(message.chat.id, 'typing')
-    status = bot.reply_to(message, "⚡ Три быстрые нейросети думают...")
+    status = bot.reply_to(message, "🧠 Созываю ИИ-парламент из 20+ нейросетей...")
     
     response = brain.get_response(user_id, user_text)
     
@@ -118,13 +112,9 @@ def handle_message(message):
     bot.reply_to(message, response)
 
 if __name__ == "__main__":
-    print("=" * 70)
-    print("🤖 ТРИ БЫСТРЫЕ НЕЙРОСЕТИ ЗАПУЩЕНЫ")
-    print("=" * 70)
-    print("⚡ Gemini 2.0 Flash — 1M контекста, 2-3 сек")
-    print("🎯 Trinity Large — 100% uptime, 1-2 сек")
-    print("🚀 Step 3.5 Flash — молниеносная, 2-3 сек")
-    print("=" * 70)
+    print("=" * 80)
+    print("🤖 ИИ-ПАРЛАМЕНТ ИЗ 20+ НЕЙРОСЕТЕЙ ЗАПУЩЕН")
+    print("=" * 80)
     
     try:
         bot.polling(non_stop=True, interval=0, timeout=20)
