@@ -29,4 +29,4 @@ jobs:
         BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
         OPENROUTER_KEY: ${{ secrets.OPENROUTER_KEY }}
       run: python bot.py
-      timeout-minutes: 4
+      timeout-minutes: 6
