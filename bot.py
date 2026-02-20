@@ -1,7 +1,3 @@
-"""
-🤖 TELEGRAM БОТ — С DEEPSEEK, ПОНИМАЕТ ФОТО, БЕСПЛАТНО
-"""
-
 import os
 import telebot
 from telebot import types
@@ -22,7 +18,7 @@ def start(message):
     markup.row('🎭 Шутка', '🔍 Факт', '❓ Помощь')
     
     welcome = """
-🌟 **СУПЕР-БОТ С DEEPSEEK** 🌟
+🌟 **СУПЕР-БОТ С DEEPSEEK V3** 🌟
 **БЕСПЛАТНО, ПОНИМАЕТ ФОТО, УМНЫЙ КАК CHATGPT!**
 
 📸 **ОТПРАВЛЯЙ ФОТО — РЕШУ ЛЮБОЙ ПРИМЕР!**
@@ -33,7 +29,6 @@ def start(message):
 • `cos30`
 • `x² - 5x + 6 = 0`
 • `расскажи шутку`
-• `интересный факт`
 
 **ПРОСТО НАПИШИ МНЕ!** 🚀
     """
@@ -67,7 +62,6 @@ def handle_message(message):
     if user_id in users:
         users[user_id]['messages'] += 1
     
-    # Кнопки
     if user_text == '📸 Отправить фото':
         bot.send_message(message.chat.id, "📸 Отправь мне фото с примером!")
         return
@@ -110,7 +104,7 @@ def clear_command(message):
 
 if __name__ == "__main__":
     print("=" * 60)
-    print("🤖 БОТ С DEEPSEEK ЗАПУЩЕН — БЕСПЛАТНО!")
+    print("🤖 БОТ С DEEPSEEK V3 ЗАПУЩЕН — БЕСПЛАТНО!")
     print("=" * 60)
     print("📸 Понимает фото")
     print("🧮 Правильно считает примеры")
