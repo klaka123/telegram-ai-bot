@@ -23,7 +23,8 @@ import io
 
 class SuperGodAI:
     def __init__(self):
-        self.github_token = os.environ.get('GITHUB_TOKEN')
+        # Используем GH_TOKEN (так как GITHUB_TOKEN запрещен)
+        self.github_token = os.environ.get('GH_TOKEN')
         self.client = None
         if self.github_token:
             try:
@@ -46,7 +47,7 @@ class SuperGodAI:
         АНАЛИЗИРУЕТ ФОТО И РЕШАЕТ МАТЕМАТИКУ
         """
         if not self.client:
-            return "❌ Нет подключения к GPT-4o Vision. Добавь GITHUB_TOKEN в секреты!"
+            return "❌ Нет подключения к GPT-4o Vision. Добавь GH_TOKEN в секреты!"
         
         try:
             base64_image = base64.b64encode(photo_bytes).decode('utf-8')
