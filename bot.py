@@ -1,5 +1,5 @@
 """
-🤖 TELEGRAM БОТ — С GPT-4o И ФОТО
+🤖 TELEGRAM БОТ — С DEEPSEEK, ПОНИМАЕТ ФОТО, БЕСПЛАТНО
 """
 
 import os
@@ -7,6 +7,7 @@ import telebot
 from telebot import types
 from model import brain
 from datetime import datetime
+import time
 
 TOKEN = os.environ.get('BOT_TOKEN')
 bot = telebot.TeleBot(TOKEN)
@@ -21,7 +22,8 @@ def start(message):
     markup.row('🎭 Шутка', '🔍 Факт', '❓ Помощь')
     
     welcome = """
-🌟 **СУПЕР-БОТ С GPT-4o** 🌟
+🌟 **СУПЕР-БОТ С DEEPSEEK** 🌟
+**БЕСПЛАТНО, ПОНИМАЕТ ФОТО, УМНЫЙ КАК CHATGPT!**
 
 📸 **ОТПРАВЛЯЙ ФОТО — РЕШУ ЛЮБОЙ ПРИМЕР!**
 🧮 **ПРАВИЛЬНО СЧИТАЮ:** 150+150/2 = 225
@@ -47,7 +49,7 @@ def handle_photo(message):
         downloaded_file = bot.download_file(file_info.file_path)
         
         bot.send_chat_action(message.chat.id, 'typing')
-        status = bot.reply_to(message, "📸 Анализирую фото...")
+        status = bot.reply_to(message, "📸 Анализирую фото через DeepSeek...")
         
         analysis = brain.analyze_photo(downloaded_file, message.from_user.id)
         
@@ -77,15 +79,47 @@ def handle_message(message):
     if user_text == '🔍 Факт':
         user_text = "интересный факт"
     if user_text == '❓ Помощь':
-        bot.reply_to(message, "/start - помощь")
+        help_command(message)
         return
     
     bot.send_chat_action(message.chat.id, 'typing')
     response = brain.ask_gpt(user_id, user_text)
     bot.reply_to(message, response)
 
+@bot.message_handler(commands=['help'])
+def help_command(message):
+    help_text = """
+📚 **КОМАНДЫ:**
+/start - Начать
+/help - Помощь
+/clear - Очистить память
+
+📸 **Фото:** отправь фото с примером
+🧮 **Примеры:** 150+150/2, cos30, x²-5x+6=0
+🎭 **Шутка:** расскажи шутку
+🔍 **Факт:** интересный факт
+    """
+    bot.reply_to(message, help_text)
+
+@bot.message_handler(commands=['clear'])
+def clear_command(message):
+    if brain.clear_context(message.from_user.id):
+        bot.reply_to(message, "🧹 Память очищена!")
+    else:
+        bot.reply_to(message, "✅ Память чиста!")
+
 if __name__ == "__main__":
     print("=" * 60)
-    print("🤖 БОТ ЗАПУЩЕН — ЖДЁМ СООБЩЕНИЯ")
+    print("🤖 БОТ С DEEPSEEK ЗАПУЩЕН — БЕСПЛАТНО!")
     print("=" * 60)
-    bot.infinity_polling()
+    print("📸 Понимает фото")
+    print("🧮 Правильно считает примеры")
+    print("💬 Общается как ChatGPT")
+    print("=" * 60)
+    
+    try:
+        bot.polling(non_stop=True, interval=0, timeout=20)
+    except Exception as e:
+        print(f"❌ Ошибка: {e}")
+        time.sleep(5)
+        bot.polling(non_stop=True, interval=0, timeout=20)
