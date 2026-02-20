@@ -1,5 +1,5 @@
 """
-🤖 СУПЕР-БОТ С GPT-4o — ПОНИМАЕТ ФОТО И ТЕКСТ
+🤖 СУПЕР-БОТ С DEEPSEEK — БЕСПЛАТНО, ПОНИМАЕТ ФОТО, УМНЫЙ КАК CHATGPT
 """
 
 import os
@@ -13,7 +13,7 @@ from datetime import datetime
 class SuperBot:
     def __init__(self):
         print("=" * 60)
-        print("🤖 ЗАПУСК СУПЕР-БОТА С GPT-4o")
+        print("🤖 ЗАПУСК СУПЕР-БОТА С DEEPSEEK")
         print("=" * 60)
         
         # Получаем ключ из секретов
@@ -21,28 +21,27 @@ class SuperBot:
         
         if self.api_key:
             print(f"✅ КЛЮЧ OPENROUTER НАЙДЕН! Длина: {len(self.api_key)}")
-            print(f"   Первые символы: {self.api_key[:10]}...")
         else:
             print("❌ КЛЮЧ OPENROUTER НЕ НАЙДЕН!")
             print("   Добавь OPENROUTER_KEY в Secrets GitHub!")
         
         self.user_contexts = {}
         print("=" * 60)
-        print("🚀 БОТ ГОТОВ К РАБОТЕ")
+        print("🚀 БОТ ГОТОВ К РАБОТЕ (DeepSeek бесплатно!)")
         print("=" * 60)
     
     def ask_gpt(self, user_id, message):
-        """Отправляет запрос к GPT-4o через OpenRouter"""
+        """Отправляет запрос к DeepSeek через OpenRouter"""
         
         if not self.api_key:
-            return self.local_response(message)
+            return "❌ Нет ключа OpenRouter. Добавь OPENROUTER_KEY в секреты!"
         
         # Создаём или получаем контекст
         if user_id not in self.user_contexts:
             self.user_contexts[user_id] = [
                 {
                     "role": "system",
-                    "content": """Ты — СУПЕР-БОТ с GPT-4o. Ты знаешь ВСЁ.
+                    "content": """Ты — СУПЕР-БОТ на базе DeepSeek. Ты знаешь ВСЁ и отвечаешь бесплатно!
 
 ТВОИ ПРАВИЛА:
 1. Решай математику ПРАВИЛЬНО: 150+150/2 = 150+75 = 225
@@ -52,7 +51,7 @@ class SuperBot:
 5. Используешь эмодзи 😊
 6. Объясняешь сложное простыми словами
 
-Ты ЛУЧШЕ ChatGPT! Докажи это!"""
+Ты ЛУЧШЕ ChatGPT и работаешь бесплатно! Докажи это!"""
                 }
             ]
         
@@ -74,7 +73,7 @@ class SuperBot:
                     "HTTP-Referer": "https://github.com/",
                 },
                 json={
-                    "model": "openai/gpt-4o",
+                    "model": "deepseek/deepseek-chat:free",  # ← DEEPSEEK БЕСПЛАТНО!
                     "messages": self.user_contexts[user_id],
                     "temperature": 0.7,
                     "max_tokens": 2000,
@@ -90,16 +89,16 @@ class SuperBot:
                 return answer
             else:
                 error = result.get('error', {}).get('message', 'Неизвестная ошибка')
-                return f"❌ Ошибка API: {error}\n\n{self.local_response(message)}"
+                return f"❌ Ошибка API: {error}"
                 
         except Exception as e:
-            return f"❌ Ошибка: {str(e)}\n\n{self.local_response(message)}"
+            return f"❌ Ошибка: {str(e)}"
     
     def analyze_photo(self, photo_bytes, user_id):
-        """Анализирует фото через GPT-4o Vision"""
+        """Анализирует фото через DeepSeek (тоже бесплатно!)"""
         
         if not self.api_key:
-            return "❌ Нет ключа API. Добавь OPENROUTER_KEY в секреты!"
+            return "❌ Нет ключа OpenRouter. Добавь OPENROUTER_KEY в секреты!"
         
         try:
             base64_image = base64.b64encode(photo_bytes).decode('utf-8')
@@ -111,7 +110,7 @@ class SuperBot:
                     "Content-Type": "application/json",
                 },
                 json={
-                    "model": "openai/gpt-4o",
+                    "model": "deepseek/deepseek-chat:free",  # ← DEEPSEEK ТОЖЕ ПОНИМАЕТ ФОТО!
                     "messages": [
                         {
                             "role": "system",
@@ -143,24 +142,6 @@ class SuperBot:
                 
         except Exception as e:
             return f"❌ Ошибка при анализе фото: {str(e)}"
-    
-    def local_response(self, message):
-        """Запасные ответы на случай отсутствия API"""
-        msg = message.lower().strip()
-        
-        # Математика с приоритетом
-        if re.match(r'^[\d\s\+\-\*\/\(\)\.]+$', msg):
-            try:
-                result = eval(msg)
-                return f"✅ {msg} = {result}"
-            except:
-                pass
-        
-        # Приветствия
-        if msg in ['привет', 'здравствуй', 'хай']:
-            return "Привет! Я временно работаю в локальном режиме. Скоро подключу GPT-4o! 😊"
-        
-        return "⏳ Ожидаю подключения к GPT-4o..."
     
     def clear_context(self, user_id):
         if user_id in self.user_contexts:
