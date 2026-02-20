@@ -23,8 +23,19 @@ import io
 
 class SuperGodAI:
     def __init__(self):
-        # Используем GH_TOKEN (так как GITHUB_TOKEN запрещен)
+        # ПРОВЕРКА ТОКЕНА
+        print("=" * 50)
+        print("🔍 ПРОВЕРКА ТОКЕНОВ:")
         self.github_token = os.environ.get('GH_TOKEN')
+        
+        if self.github_token:
+            print(f"✅ GH_TOKEN найден! Длина: {len(self.github_token)}")
+            print(f"   Первые символы: {self.github_token[:10]}...")
+        else:
+            print("❌ GH_TOKEN НЕ НАЙДЕН!")
+            print("   Проверь Secrets в GitHub: Settings → Secrets and variables → Actions")
+            print("   Там должен быть GH_TOKEN с твоим токеном")
+        
         self.client = None
         if self.github_token:
             try:
@@ -36,6 +47,8 @@ class SuperGodAI:
                 print("✅ GPT-4o Vision подключен")
             except Exception as e:
                 print(f"❌ Ошибка GPT: {e}")
+        else:
+            print("❌ GPT-4o Vision НЕ подключен - токена нет")
         
         self.user_contexts = {}
         print("=" * 50)
@@ -47,7 +60,22 @@ class SuperGodAI:
         АНАЛИЗИРУЕТ ФОТО И РЕШАЕТ МАТЕМАТИКУ
         """
         if not self.client:
-            return "❌ Нет подключения к GPT-4o Vision. Добавь GH_TOKEN в секреты!"
+            return """❌ **Нет подключения к GPT-4o Vision**
+
+Возможные причины:
+1. Токен GH_TOKEN не добавлен в Secrets GitHub
+2. Токен неправильный или истек
+3. Нет интернета у сервера
+
+**Как исправить:**
+1. Settings → Secrets and variables → Actions
+2. Добавь GH_TOKEN с твоим токеном
+3. Перезапусти Actions
+
+Пока можешь писать примеры текстом, например:
+• `1500+1500/2`
+• `cos30`
+• `x²-5x+6=0`"""
         
         try:
             base64_image = base64.b64encode(photo_bytes).decode('utf-8')
@@ -81,7 +109,7 @@ class SuperGodAI:
             return response.choices[0].message.content
             
         except Exception as e:
-            return f"❌ Ошибка: {str(e)}"
+            return f"❌ Ошибка при анализе: {str(e)}"
     
     def solve_math(self, problem: str) -> str:
         """Решает математику из текста"""
@@ -147,7 +175,15 @@ class SuperGodAI:
         
         # Кто ты
         if 'кто ты' in msg:
-            return "Я Супер-бог математики! Отправь фото с примером - решу! 📸"
+            return """Я Супер-бог математики! 📸
+
+📸 Отправь фото - решу примеры!
+🧮 Напиши текст - тоже решу!
+
+Примеры:
+• `1500+1500/2`
+• `cos30`
+• `x²-5x+6=0`"""
         
         return f"❓ Я не понял. Отправь фото или напиши пример (например: 1500+1500/2)"
 
