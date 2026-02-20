@@ -140,9 +140,10 @@ def handle_text(message):
     users_stats[user_id]['messages'] += 1
     
     # Обработка кнопок
-    if user_text == '💬 Поговорить':
-        bot.send_message(message.chat.id, "👋 Отлично! Я слушаю...")
-        return
+    # Обработка кнопок
+if user_text == '💬 Поговорить':
+    bot.send_message(message.chat.id, "👋 Отлично! Я слушаю... Напиши мне что-нибудь!")
+    return  # ЭТОТ return НЕ ДАЕТ БОТУ ОТВЕТИТЬ НА СЛЕДУЮЩЕЕ СООБЩЕНИЕ!
     elif user_text == '📊 Статистика':
         stats_command(message)
         return
