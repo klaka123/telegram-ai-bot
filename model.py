@@ -1,5 +1,5 @@
 """
-🤖 СУПЕР-БОТ С DEEPSEEK — БЕСПЛАТНО, ПОНИМАЕТ ФОТО, УМНЫЙ КАК CHATGPT
+🤖 СУПЕР-БОТ С DEEPSEEK V3 — БЕСПЛАТНО, ПОНИМАЕТ ФОТО, УМНЫЙ КАК CHATGPT
 """
 
 import os
@@ -13,7 +13,7 @@ from datetime import datetime
 class SuperBot:
     def __init__(self):
         print("=" * 60)
-        print("🤖 ЗАПУСК СУПЕР-БОТА С DEEPSEEK")
+        print("🤖 ЗАПУСК СУПЕР-БОТА С DEEPSEEK V3")
         print("=" * 60)
         
         # Получаем ключ из секретов
@@ -21,17 +21,18 @@ class SuperBot:
         
         if self.api_key:
             print(f"✅ КЛЮЧ OPENROUTER НАЙДЕН! Длина: {len(self.api_key)}")
+            print(f"   Первые символы: {self.api_key[:10]}...")
         else:
             print("❌ КЛЮЧ OPENROUTER НЕ НАЙДЕН!")
             print("   Добавь OPENROUTER_KEY в Secrets GitHub!")
         
         self.user_contexts = {}
         print("=" * 60)
-        print("🚀 БОТ ГОТОВ К РАБОТЕ (DeepSeek бесплатно!)")
+        print("🚀 БОТ ГОТОВ К РАБОТЕ (DeepSeek V3 бесплатно!)")
         print("=" * 60)
     
     def ask_gpt(self, user_id, message):
-        """Отправляет запрос к DeepSeek через OpenRouter"""
+        """Отправляет запрос к DeepSeek V3 через OpenRouter"""
         
         if not self.api_key:
             return "❌ Нет ключа OpenRouter. Добавь OPENROUTER_KEY в секреты!"
@@ -41,10 +42,10 @@ class SuperBot:
             self.user_contexts[user_id] = [
                 {
                     "role": "system",
-                    "content": """Ты — СУПЕР-БОТ на базе DeepSeek. Ты знаешь ВСЁ и отвечаешь бесплатно!
+                    "content": """Ты — СУПЕР-БОТ на базе DeepSeek V3. Ты знаешь ВСЁ и отвечаешь бесплатно!
 
 ТВОИ ПРАВИЛА:
-1. Решай математику ПРАВИЛЬНО: 150+150/2 = 150+75 = 225
+1. Решай математику ПРАВИЛЬНО: 150+150/2 = 150+75 = 225 (сначала деление!)
 2. Запоминай диалог и отвечай по контексту
 3. Знаешь физику, химию, историю, географию
 4. Отвечаешь на русском и английском
@@ -71,9 +72,10 @@ class SuperBot:
                     "Authorization": f"Bearer {self.api_key}",
                     "Content-Type": "application/json",
                     "HTTP-Referer": "https://github.com/",
+                    "X-Title": "Telegram AI Bot"
                 },
                 json={
-                    "model": "deepseek/deepseek-chat:free",  # ← DEEPSEEK БЕСПЛАТНО!
+                    "model": "deepseek/deepseek-chat-v3-0324:free",  # ← DEEPSEEK V3 РАБОЧАЯ ВЕРСИЯ!
                     "messages": self.user_contexts[user_id],
                     "temperature": 0.7,
                     "max_tokens": 2000,
@@ -95,7 +97,7 @@ class SuperBot:
             return f"❌ Ошибка: {str(e)}"
     
     def analyze_photo(self, photo_bytes, user_id):
-        """Анализирует фото через DeepSeek (тоже бесплатно!)"""
+        """Анализирует фото через DeepSeek V3 (тоже понимает изображения!)"""
         
         if not self.api_key:
             return "❌ Нет ключа OpenRouter. Добавь OPENROUTER_KEY в секреты!"
@@ -110,11 +112,11 @@ class SuperBot:
                     "Content-Type": "application/json",
                 },
                 json={
-                    "model": "deepseek/deepseek-chat:free",  # ← DEEPSEEK ТОЖЕ ПОНИМАЕТ ФОТО!
+                    "model": "deepseek/deepseek-chat-v3-0324:free",  # ← DEEPSEEK ПОНИМАЕТ ФОТО!
                     "messages": [
                         {
                             "role": "system",
-                            "content": "Ты — гений математики. Найди на фото все математические примеры и реши их правильно. Объясняй подробно."
+                            "content": "Ты — гений математики. Найди на фото все математические примеры и реши их правильно. Объясняй подробно по шагам."
                         },
                         {
                             "role": "user",
@@ -138,15 +140,18 @@ class SuperBot:
             if "choices" in result:
                 return result["choices"][0]["message"]["content"]
             else:
-                return f"❌ Ошибка: {result.get('error', {}).get('message', 'Неизвестная ошибка')}"
+                error = result.get('error', {}).get('message', 'Неизвестная ошибка')
+                return f"❌ Ошибка: {error}"
                 
         except Exception as e:
             return f"❌ Ошибка при анализе фото: {str(e)}"
     
     def clear_context(self, user_id):
+        """Очищает контекст пользователя"""
         if user_id in self.user_contexts:
             del self.user_contexts[user_id]
             return True
         return False
 
+# Создаём экземпляр бота
 brain = SuperBot()
