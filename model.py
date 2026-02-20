@@ -49,6 +49,7 @@ class SuperBot:
                 headers={
                     "Authorization": f"Bearer {self.api_key}",
                     "Content-Type": "application/json",
+                    "HTTP-Referer": "https://github.com/",
                 },
                 json={
                     "model": model_name,
@@ -64,7 +65,7 @@ class SuperBot:
             if "choices" in result:
                 return result["choices"][0]["message"]["content"]
             else:
-                return f"[Ошибка {model_name}]"
+                return f"[Ошибка {model_name}: {result.get('error', 'Неизвестная ошибка')}]"
                 
         except Exception as e:
             return f"[Ошибка {model_name}: {str(e)}]"
@@ -109,7 +110,8 @@ class SuperBot:
 
 Твоя задача: проанализируй все три ответа и создай ОДИН ИТОГОВЫЙ ЛУЧШИЙ ОТВЕТ.
 Возьми лучшее из каждого, убери повторы, исправь ошибки.
-Ответ должен быть полным, точным и понятным."""
+Ответ должен быть полным, точным и понятным.
+В конце добавь небольшую пометку: "✅ Ответ проверен тремя нейросетями"."""
         
         merge_messages = [
             {"role": "system", "content": "Ты — главный аналитик, объединяющий ответы трёх ИИ."},
@@ -199,7 +201,8 @@ class SuperBot:
 
 Создай ОДИН ИТОГОВЫЙ ОТВЕТ, объединив лучшее из всех трёх.
 Если на фото есть примеры - реши их правильно.
-Если есть геометрические фигуры - опиши их."""
+Если есть геометрические фигуры - опиши их.
+В конце добавь: "📸 Проанализировано тремя нейросетями"."""
             
             merge_messages = [
                 {"role": "system", "content": "Ты — главный аналитик, объединяющий ответы трёх ИИ."},
