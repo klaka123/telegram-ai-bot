@@ -30,7 +30,7 @@ class SuperGodAI:
         # ⚠️⚠️⚠️ ВСТАВЬ СВОЙ ТОКЕН СЮДА ⚠️⚠️⚠️
         # Токен должен начинаться с ghp_ и выглядеть примерно так:
         # ghp_abc123def456ghi789jkl012mno345pqr678stu
-        self.github_token = "ghp_твой_токен_сюда"  # ← ЗАМЕНИ НА СВОЙ ТОКЕН!
+        self.github_token = "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"  # ← ЗАМЕНИ НА СВОЙ ТОКЕН!
         
         print(f"1️⃣ Токен в коде: {'✅ ЕСТЬ' if self.github_token and self.github_token != 'ghp_твой_токен_сюда' else '❌ НЕТ'}")
         
@@ -72,7 +72,7 @@ class SuperGodAI:
 
 1️⃣ Открой файл `model.py`
 2️⃣ Найди строку: `self.github_token = "ghp_твой_токен_сюда"`
-3️⃣ Вставь свой реальный токен вместо `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`
+3️⃣ Вставь свой реальный токен вместо `ghp_твой_токен_сюда`
 4️⃣ Сохрани файл и перезапусти
 
 📝 **Пока пиши текстом:**
