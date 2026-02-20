@@ -27,5 +27,6 @@ jobs:
     - name: Run Telegram Bot
       env:
         BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}    # ← ЭТА СТРОКА БЫЛА ОТСУТСТВУЕТ!
       run: python bot.py
       timeout-minutes: 4
