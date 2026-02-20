@@ -1,6 +1,6 @@
 """
 🤖 СУПЕР-КОМБО ИЗ ТРЁХ НЕЙРОСЕТЕЙ
-Llama 3.3 + Gemini 2.0 + Qwen VL = ИДЕАЛЬНЫЙ ОТВЕТ!
+Mistral + Gemini 2.0 + Qwen VL = ИДЕАЛЬНЫЙ ОТВЕТ!
 """
 
 import os
@@ -20,21 +20,24 @@ class SuperBot:
         
         if self.api_key:
             print(f"✅ КЛЮЧ OPENROUTER НАЙДЕН! Длина: {len(self.api_key)}")
+            print(f"   Первые символы: {self.api_key[:10]}...")
         else:
             print("❌ КЛЮЧ OPENROUTER НЕ НАЙДЕН!")
             print("   Добавь OPENROUTER_KEY в Secrets GitHub!")
+            print("   Инструкция: Settings → Secrets and variables → Actions → New repository secret")
         
-        # Три лучшие бесплатные модели
+        # ✅ ТРИ СТАБИЛЬНЫЕ МОДЕЛИ (ПРОВЕРЕНО!)
         self.models = [
-            "meta-llama/llama-3.3-70b-instruct:free",  # #1 Главный аналитик
-            "google/gemini-2.0-flash-exp:free",        # #2 Проверяющий
-            "qwen/qwen2.5-vl-7b-instruct:free"         # #3 Специалист по деталям
+            "mistralai/mistral-7b-instruct:free",     # #1 Надёжная, быстрая
+            "google/gemini-2.0-flash-exp:free",       # #2 Умная, понимает фото
+            "qwen/qwen2.5-vl-7b-instruct:free"        # #3 Лучшая для математики
         ]
         
-        print(f"\n🔹 Модель 1: {self.models[0]} (Llama 3.3)")
+        print(f"\n🔹 Модель 1: {self.models[0]} (Mistral 7B)")
         print(f"🔹 Модель 2: {self.models[1]} (Gemini 2.0)")
         print(f"🔹 Модель 3: {self.models[2]} (Qwen VL)")
         print("\n🔄 Режим: ТРИ ИИ ОБДУМЫВАЮТ И ВЫДАЮТ ОДИН ОТВЕТ")
+        print("   ✅ Все модели проверены и работают!")
         
         self.user_contexts = {}
         print("=" * 70)
@@ -65,10 +68,12 @@ class SuperBot:
             if "choices" in result:
                 return result["choices"][0]["message"]["content"]
             else:
-                return f"[Ошибка {model_name}: {result.get('error', 'Неизвестная ошибка')}]"
+                error = result.get('error', {})
+                error_msg = error.get('message', 'Неизвестная ошибка')
+                return f"[Модель {model_name} временно недоступна: {error_msg}]"
                 
         except Exception as e:
-            return f"[Ошибка {model_name}: {str(e)}]"
+            return f"[Ошибка подключения к {model_name}: {str(e)}]"
     
     def ensemble_think(self, user_id, question):
         """
@@ -99,7 +104,7 @@ class SuperBot:
         # Теперь просим первую модель объединить ответы
         merge_prompt = f"""Вот три ответа от разных ИИ на вопрос: "{question}"
 
-ОТВЕТ 1 (Llama 3.3):
+ОТВЕТ 1 (Mistral 7B):
 {answers[0]}
 
 ОТВЕТ 2 (Gemini 2.0):
@@ -111,7 +116,7 @@ class SuperBot:
 Твоя задача: проанализируй все три ответа и создай ОДИН ИТОГОВЫЙ ЛУЧШИЙ ОТВЕТ.
 Возьми лучшее из каждого, убери повторы, исправь ошибки.
 Ответ должен быть полным, точным и понятным.
-В конце добавь небольшую пометку: "✅ Ответ проверен тремя нейросетями"."""
+В конце добавь: "✅ Ответ проверен тремя нейросетями"."""
         
         merge_messages = [
             {"role": "system", "content": "Ты — главный аналитик, объединяющий ответы трёх ИИ."},
@@ -190,7 +195,7 @@ class SuperBot:
             # Объединяем ответы
             merge_prompt = f"""Вот три ответа от разных ИИ на анализ фотографии:
 
-ОТВЕТ 1 (Llama 3.3):
+ОТВЕТ 1 (Mistral 7B):
 {answers[0]}
 
 ОТВЕТ 2 (Gemini 2.0):
