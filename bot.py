@@ -1,5 +1,5 @@
 """
-🤖 TELEGRAM БОТ - СУПЕР-БОГ МАТЕМАТИКИ
+🤖 TELEGRAM БОТ — МЕГА-УРОВЕНЬ
 """
 
 import os
@@ -27,19 +27,25 @@ def start(message):
     markup.row('📊 Статистика', '🔄 Очистить', 'ℹ️ О боте')
     
     welcome = """
-🌟 **СУПЕР-БОГ МАТЕМАТИКИ** 🌟
+🌟 **МЕГА-БОТ — УРОВЕНЬ CHATGPT + DEEPSEEK** 🌟
 
-📸 **ОТПРАВЬ ФОТО С ПРИМЕРОМ - Я РЕШУ!**
-🧮 **ПОНИМАЮ ЛЮБЫЕ ПРИМЕРЫ:** 1500+1500/2, cos30, x²-5x+6=0
+📸 **ОТПРАВЬ ФОТО С ПРИМЕРОМ — Я РЕШУ!**
+🧮 **ПРАВИЛЬНО СЧИТАЮ:** 150+150/2 = 225 (сначала деление!)
 
-📌 **Что я умею:**
-• Решать примеры с фото
-• Арифметика: 1500+1500/2 = 2250
-• Тригонометрия: cos30° = 0.866
-• Уравнения: x²-5x+6=0 → x=2, x=3
-• Шутить и общаться
+📌 **ЧТО Я УМЕЮ:**
+• Математика (алгебра, геометрия, тригонометрия)
+• Физика, химия, история
+• Общение на русском и английском
+• Шутки и интересные факты
 
-**ПРОСТО ОТПРАВЬ ФОТО ИЛИ НАПИШИ ПРИМЕР!** 🚀
+📝 **ПРИМЕРЫ ЗАПРОСОВ:**
+• `150 + 150/2`
+• `cos30`
+• `x² - 5x + 6 = 0`
+• `расскажи шутку`
+• `интересный факт`
+
+**ПРОСТО НАПИШИ МНЕ ЧТО-НИБУДЬ!** 🚀
     """
     
     bot.send_message(message.chat.id, welcome, reply_markup=markup, parse_mode='Markdown')
@@ -57,19 +63,17 @@ def help_command(message):
 📚 **КОМАНДЫ И ВОЗМОЖНОСТИ:**
 
 📸 **ФОТО:**
-• Отправь фото с примером - я решу!
-• Понимаю рукописный текст
+• Отправь фото с примером — я решу!
 
-🧮 **ПРИМЕРЫ:**
-• `1500+1500/2` → 2250
-• `cos30` → 0.866
-• `x+5=10` → x=5
-• `x²-5x+6=0` → x=2, x=3
+🧮 **МАТЕМАТИКА:**
+• `150 + 150/2` = 225 (правильный порядок!)
+• `cos30` = 0.866
+• `x² - 5x + 6 = 0` → x=2, x=3
 
-🎭 **ОБЩЕНИЕ:**
-• `привет`
-• `шутка`
-• `факт`
+💬 **ОБЩЕНИЕ:**
+• `привет`, `как дела`
+• `расскажи шутку`
+• `интересный факт`
 • `кто ты`
 
 ⚙️ **КОМАНДЫ:**
@@ -77,6 +81,7 @@ def help_command(message):
 /help - Помощь
 /clear - Очистить память
 /stats - Статистика
+/about - О боте
 
 🎯 **ПРОСТО ПИШИ ИЛИ ОТПРАВЛЯЙ ФОТО!**
     """
@@ -109,10 +114,11 @@ def stats_command(message):
 • Сообщений: {sum(u['messages'] for u in users.values())}
 
 🧠 **ИИ:**
-• Модель: GPT-4o Vision
-• Понимает: Фото, математику
+• Модель: GPT-4o
+• Уровень: ChatGPT + DeepSeek
+• Языки: русский, английский
 
-💡 **Работает 24/7 на GitHub!**
+💡 **Работает 24/7!**
     """
     bot.send_message(message.chat.id, stats, parse_mode='Markdown')
 
@@ -120,60 +126,55 @@ def stats_command(message):
 def about_command(message):
     """О боте"""
     about = """
-🧠 **О СУПЕР-БОГЕ МАТЕМАТИКИ**
+🧠 **О МЕГА-БОТЕ**
 
-📸 **ГЛАВНАЯ ФИШКА:**
-• Понимает математику на фото!
-• Решает рукописные примеры!
+**Уровень:** ChatGPT + DeepSeek
+**Модель:** GPT-4o через OpenRouter
 
-🧮 **ЧТО РЕШАЕТ:**
-• Арифметика: 1500+1500/2
-• Тригонометрия: cos30°
-• Уравнения: x²-5x+6=0
+📚 **ЗНАНИЯ:**
+• Математика (алгебра, геометрия, тригонометрия)
+• Физика (механика, оптика, квантовая)
+• Химия (элементы, реакции, формулы)
+• История (все эпохи)
+• Языки (русский, английский)
 
-🚀 **Технологии:**
-• GPT-4o Vision от GitHub
-• SymPy для математики
+📸 **ФУНКЦИИ:**
+• Распознавание фото с примерами
+• Правильный порядок вычислений
+• Поддержка диалога
+• Шутки и факты
 
 💰 **Цена:** АБСОЛЮТНО БЕСПЛАТНО!
 
-🌟 **Отправляй фото и получай решения!**
+🌟 **Наслаждайся общением!**
     """
     bot.send_message(message.chat.id, about, parse_mode='Markdown')
 
 # ========== ОБРАБОТКА ФОТО ==========
 @bot.message_handler(content_types=['photo'])
 def handle_photo(message):
-    """Обработка фотографий - ГЛАВНАЯ ФИШКА!"""
+    """Обработка фотографий"""
     
     try:
-        # Получаем фото
         file_id = message.photo[-1].file_id
         file_info = bot.get_file(file_id)
         downloaded_file = bot.download_file(file_info.file_path)
         
-        # Показываем что бот думает
         bot.send_chat_action(message.chat.id, 'typing')
-        
-        # Отправляем уведомление
         status_msg = bot.reply_to(message, "📸 Анализирую фото... Секунду!")
         
-        # Анализируем фото через GPT-4o Vision
-        analysis = brain.analyze_photo_math(downloaded_file)
+        analysis = brain.analyze_photo(downloaded_file, message.from_user.id)
         
-        # Удаляем статусное сообщение
         bot.delete_message(message.chat.id, status_msg.message_id)
-        
-        # Отправляем результат
         bot.reply_to(message, f"📸 **РЕШЕНИЕ ПО ФОТО:**\n\n{analysis}")
         
     except Exception as e:
-        bot.reply_to(message, f"❌ Ошибка при обработке фото: {str(e)}\n\nПопробуй написать пример текстом!")
+        bot.reply_to(message, f"❌ Ошибка: {str(e)}\n\nПопробуй написать пример текстом!")
 
 # ========== ОБРАБОТКА СООБЩЕНИЙ ==========
 @bot.message_handler(func=lambda m: True)
 def handle_message(message):
-    """Обработка всех текстовых сообщений"""
+    """Обработка всех сообщений"""
     
     user_id = message.from_user.id
     user_text = message.text
@@ -187,14 +188,14 @@ def handle_message(message):
         return
     
     if user_text == '🧮 Решить пример':
-        bot.send_message(message.chat.id, "🧮 Напиши любой пример!\n\nНапример:\n• `1500+1500/2`\n• `cos30`\n• `x²-5x+6=0`")
+        bot.send_message(message.chat.id, "🧮 Напиши любой пример!\n\nНапример:\n• `150 + 150/2`\n• `cos30`\n• `x² - 5x + 6 = 0`")
         return
     
     if user_text == '🎭 Шутка':
-        user_text = "шутка"
+        user_text = "расскажи шутку"
     
     if user_text == '🔍 Факт':
-        user_text = "факт"
+        user_text = "интересный факт"
     
     if user_text == '❓ Помощь':
         help_command(message)
@@ -216,18 +217,20 @@ def handle_message(message):
     bot.send_chat_action(message.chat.id, 'typing')
     
     # Получаем ответ
-    response = brain.get_response(user_id, user_text)
+    response = brain.ask_gpt(user_id, user_text)
     
     # Отправляем ответ
     bot.reply_to(message, response)
 
 # ========== ЗАПУСК ==========
 if __name__ == "__main__":
-    print("=" * 50)
-    print("🤖 СУПЕР-БОГ МАТЕМАТИКИ ЗАПУЩЕН")
-    print("=" * 50)
-    print("📸 Понимает фото с примерами!")
-    print("🧮 Решает: 1500+1500/2, cos30")
-    print("=" * 50)
+    print("=" * 60)
+    print("🤖 МЕГА-БОТ ЗАПУЩЕН — УРОВЕНЬ CHATGPT")
+    print("=" * 60)
+    print("🧠 Модель: GPT-4o")
+    print("📚 Знания: математика, физика, химия, история")
+    print("💬 Языки: русский, английский")
+    print("📸 Фото: поддерживается")
+    print("=" * 60)
     
     bot.infinity_polling()
