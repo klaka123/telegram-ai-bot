@@ -1,6 +1,5 @@
 """
-🤖 TELEGRAM БОТ — СУПЕР-КОМБО ИЗ ТРЁХ НЕЙРОСЕТЕЙ
-Mistral + Gemini 2.0 + Qwen VL
+🤖 TELEGRAM БОТ — ТРИ БЫСТРЫЕ НЕЙРОСЕТИ
 """
 
 import os
@@ -23,20 +22,23 @@ def start(message):
     markup.row('🎭 Шутка', '🔍 Факт', '❓ Помощь')
     
     welcome = """
-🌟 **СУПЕР-КОМБО ИЗ ТРЁХ НЕЙРОСЕТЕЙ** 🌟
-**Mistral 7B + Gemini 2.0 + Qwen VL = ИДЕАЛЬНЫЙ ОТВЕТ!**
+🌟 **ТРИ БЫСТРЫЕ НЕЙРОСЕТИ** 🌟
+**Gemini 2.0 Flash + Trinity Large + Step 3.5 Flash**
 
-📸 **ОТПРАВЛЯЙ ФОТО — ТРИ ИИ ОБДУМАЮТ И РЕШАТ!**
-🧮 **ПРАВИЛЬНО СЧИТАЮТ:** 150+150/2 = 225 (проверено трижды)
+⚡ **СУПЕР-СКОРОСТЬ:**
+• Gemini 2.0 Flash (1 млн контекста)
+• Trinity Large (100% uptime)
+• Step 3.5 Flash (молниеносная)
+
+📸 **ОТПРАВЛЯЙ ФОТО — РЕШУ ЗА СЕКУНДЫ!**
+🧮 **ПРАВИЛЬНО СЧИТАЮ:** 150+150/2 = 225 (сначала деление)
 
 📝 **ПРИМЕРЫ:**
 • `150 + 150 / 2`
 • `cos30`
 • `x² - 5x + 6 = 0`
-• `расскажи шутку`
-• `интересный факт`
 
-**ТРИ ГОЛОВЫ ЛУЧШЕ, ЧЕМ ОДНА!** 🚀
+**ТРИ МОЗГА РАБОТАЮТ БЫСТРЕЕ ОДНОГО!** 🚀
     """
     
     bot.send_message(message.chat.id, welcome, reply_markup=markup, parse_mode='Markdown')
@@ -50,12 +52,12 @@ def help_command(message):
 /help - Помощь
 /clear - Очистить память
 
-📸 **Фото:** отправь фото с примером — три ИИ проанализируют
+📸 **Фото:** отправь фото с примером
 🧮 **Примеры:** 150+150/2, cos30, x²-5x+6=0
 🎭 **Шутка:** расскажи шутку
 🔍 **Факт:** интересный факт
 
-**Три нейросети работают вместе для лучшего ответа!** 🤖🤖🤖
+**⚡ Три быстрые нейросети отвечают за секунды!**
     """
     bot.reply_to(message, help_text)
 
@@ -74,7 +76,7 @@ def handle_photo(message):
         downloaded_file = bot.download_file(file_info.file_path)
         
         bot.send_chat_action(message.chat.id, 'typing')
-        status = bot.reply_to(message, "📸 Три нейросети анализируют фото... Это займёт пару секунд!")
+        status = bot.reply_to(message, "📸 Три быстрые нейросети анализируют фото...")
         
         analysis = brain.analyze_photo(downloaded_file, message.from_user.id)
         
@@ -94,10 +96,10 @@ def handle_message(message):
     
     # Кнопки
     if user_text == '📸 Отправить фото':
-        bot.send_message(message.chat.id, "📸 Отправь мне фото с примером — три нейросети проанализируют его!")
+        bot.send_message(message.chat.id, "📸 Отправь мне фото с примером!")
         return
     if user_text == '🧮 Пример':
-        bot.send_message(message.chat.id, "🧮 Например: `150 + 150 / 2`\nТри ИИ проверят правильность!")
+        bot.send_message(message.chat.id, "🧮 Например: `150 + 150 / 2`")
         return
     if user_text == '🎭 Шутка':
         user_text = "расскажи шутку"
@@ -108,20 +110,20 @@ def handle_message(message):
         return
     
     bot.send_chat_action(message.chat.id, 'typing')
-    status = bot.reply_to(message, "🤔 Три нейросети думают над ответом...")
+    status = bot.reply_to(message, "⚡ Три быстрые нейросети думают...")
     
-    response = brain.ask_gpt(user_id, user_text)
+    response = brain.get_response(user_id, user_text)
     
     bot.delete_message(message.chat.id, status.message_id)
     bot.reply_to(message, response)
 
 if __name__ == "__main__":
     print("=" * 70)
-    print("🤖 СУПЕР-КОМБО ИЗ ТРЁХ НЕЙРОСЕТЕЙ ЗАПУЩЕНО")
+    print("🤖 ТРИ БЫСТРЫЕ НЕЙРОСЕТИ ЗАПУЩЕНЫ")
     print("=" * 70)
-    print("📸 Понимает фото (три ИИ анализируют)")
-    print("🧮 Правильно считает примеры (проверка тремя моделями)")
-    print("💬 Общается как ChatGPT (три головы лучше одной)")
+    print("⚡ Gemini 2.0 Flash — 1M контекста, 2-3 сек")
+    print("🎯 Trinity Large — 100% uptime, 1-2 сек")
+    print("🚀 Step 3.5 Flash — молниеносная, 2-3 сек")
     print("=" * 70)
     
     try:
