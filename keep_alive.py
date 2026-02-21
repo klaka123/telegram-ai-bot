@@ -3,28 +3,32 @@ Keep-Alive механизм для Telegram бота
 Предотвращает "засыпание" на GitHub Actions
 """
 
-import requests
 import threading
 import time
+import requests
+import logging
+
+# Настройка логирования
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def keep_alive():
     """Функция для поддержания активности бота"""
+    counter = 0
     while True:
         try:
-            # Делаем простой запрос к самому себе (если бот имеет веб-сервер)
-            # или просто логируем активность
-            print(f"💓 Keep-alive сигнал в {time.strftime('%Y-%m-%d %H:%M:%S')}")
+            counter += 1
+            logging.info(f"💓 Keep-alive сигнал #{counter} в {time.strftime('%Y-%m-%d %H:%M:%S')}")
             
-            # Здесь можно добавить любой легкий запрос к вашему боту
-            # Например, проверка статуса или получение информации
+            # Здесь можно добавить легкий запрос к любому сервису
+            # или просто логировать активность
             
             time.sleep(240)  # Ждём 4 минуты перед следующим сигналом
         except Exception as e:
-            print(f"❌ Ошибка keep-alive: {e}")
+            logging.error(f"❌ Ошибка keep-alive: {e}")
             time.sleep(60)
 
 def start_keep_alive():
     """Запускает keep-alive в отдельном потоке"""
     thread = threading.Thread(target=keep_alive, daemon=True)
     thread.start()
-    print("✅ Keep-alive механизм запущен")
+    logging.info("✅ Keep-alive механизм запущен в отдельном потоке")
