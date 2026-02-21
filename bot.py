@@ -1,5 +1,5 @@
 """
-TELEGRAM БОТ — 30+ НЕЙРОСЕТЕЙ, БЫСТРЫЙ АНАЛИЗ
+TELEGRAM БОТ — 30+ НЕЙРОСЕТЕЙ, НИКОГДА НЕ ЗАСЫПАЕТ
 """
 
 import os
@@ -8,9 +8,23 @@ from telebot import types
 from model import brain
 from datetime import datetime
 import time
+import logging
+import keep_alive  # Импортируем keep-alive механизм
+
+# Настройка логирования
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Запускаем keep-alive механизм в отдельном потоке
+keep_alive.start_keep_alive()
+logging.info("✅ Keep-alive поток запущен")
 
 TOKEN = os.environ.get('BOT_TOKEN')
+if not TOKEN:
+    logging.error("❌ ОШИБКА: BOT_TOKEN не найден!")
+    exit(1)
+
 bot = telebot.TeleBot(TOKEN)
+logging.info("✅ Telegram бот инициализирован")
 
 users = {}
 bot_start = datetime.now()
@@ -29,6 +43,7 @@ def start(message):
 • Система находит консенсус большинства
 • Скорость ответа: 3-8 секунд
 • Распознавание фото через Vision-модели
+• Бот работает 24/7 без засыпания
 
 Возможности:
 • Математика (150 + 150 / 2 = 225)
@@ -41,6 +56,7 @@ def start(message):
     
     bot.send_message(message.chat.id, welcome, reply_markup=markup)
     users[message.from_user.id] = {'messages': 0}
+    logging.info(f"👤 Новый пользователь: {message.from_user.first_name} (ID: {message.from_user.id})")
 
 @bot.message_handler(commands=['help'])
 def help_command(message):
@@ -65,6 +81,7 @@ def help_command(message):
 def clear_command(message):
     if brain.clear_context(message.from_user.id):
         bot.reply_to(message, "История диалога очищена")
+        logging.info(f"🧹 Очищена история для пользователя {message.from_user.id}")
     else:
         bot.reply_to(message, "История уже пуста")
 
@@ -76,15 +93,19 @@ def handle_photo(message):
         downloaded_file = bot.download_file(file_info.file_path)
         
         bot.send_chat_action(message.chat.id, 'typing')
-        status = bot.reply_to(message, "Анализ фото через Vision-модели...")
+        status = bot.reply_to(message, "📸 Анализ фото через Vision-модели...")
+        logging.info(f"📸 Получено фото от пользователя {message.from_user.id}")
         
         analysis = brain.analyze_photo(downloaded_file, message.from_user.id)
         
         bot.delete_message(message.chat.id, status.message_id)
         bot.reply_to(message, analysis)
+        logging.info(f"✅ Фото обработано")
         
     except Exception as e:
-        bot.reply_to(message, f"Ошибка: {str(e)}")
+        error_msg = f"Ошибка обработки фото: {str(e)}"
+        bot.reply_to(message, error_msg)
+        logging.error(error_msg)
 
 @bot.message_handler(func=lambda m: True)
 def handle_message(message):
@@ -110,21 +131,24 @@ def handle_message(message):
         return
     
     bot.send_chat_action(message.chat.id, 'typing')
-    status = bot.reply_to(message, "Анализ запроса...")
+    status = bot.reply_to(message, "🔄 Анализ запроса...")
+    logging.info(f"💬 Запрос от {user_id}: {user_text[:50]}...")
     
     response = brain.get_response(user_id, user_text)
     
     bot.delete_message(message.chat.id, status.message_id)
     bot.reply_to(message, response)
+    logging.info(f"✅ Ответ отправлен")
 
 if __name__ == "__main__":
-    print("=" * 80)
-    print("ЗАПУСК TELEGRAM БОТА — 30+ НЕЙРОСЕТЕЙ")
-    print("=" * 80)
+    logging.info("=" * 80)
+    logging.info("🚀 ЗАПУСК TELEGRAM БОТА — 30+ НЕЙРОСЕТЕЙ, 24/7 РЕЖИМ")
+    logging.info("=" * 80)
     
-    try:
-        bot.polling(non_stop=True, interval=0, timeout=20)
-    except Exception as e:
-        print(f"Ошибка: {e}")
-        time.sleep(5)
-        bot.polling(non_stop=True, interval=0, timeout=20)
+    while True:
+        try:
+            bot.polling(non_stop=True, interval=0, timeout=20)
+        except Exception as e:
+            logging.error(f"❌ Ошибка polling: {e}")
+            logging.info("🔄 Перезапуск через 5 секунд...")
+            time.sleep(5)
