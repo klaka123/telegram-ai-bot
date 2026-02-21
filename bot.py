@@ -1,36 +1,22 @@
 """
-TELEGRAM БОТ — Стабильная версия без конфликтов
+TELEGRAM БОТ — Стабильная версия без зависаний
 """
 
 import os
 import telebot
 from telebot import types
 from model import brain
-from datetime import datetime
-import time
 import logging
-import signal
-import sys
+import time
 
-# Настройка логирования
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO)
 
 TOKEN = os.environ.get('BOT_TOKEN')
 if not TOKEN:
-    logging.error("❌ ОШИБКА: BOT_TOKEN не найден!")
-    sys.exit(1)
+    logging.error("❌ Нет токена!")
+    exit(1)
 
 bot = telebot.TeleBot(TOKEN)
-logging.info("✅ Telegram бот инициализирован")
-
-# Обработчик сигналов для корректного завершения
-def signal_handler(sig, frame):
-    logging.info("👋 Получен сигнал завершения, останавливаю бота...")
-    bot.stop_polling()
-    sys.exit(0)
-
-signal.signal(signal.SIGINT, signal_handler)
-signal.signal(signal.SIGTERM, signal_handler)
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -43,41 +29,13 @@ def start(message):
 
 Принцип работы:
 • 30+ нейросетей одновременно анализируют вопрос
-• Система находит консенсус большинства
-• Скорость ответа: 3-8 секунд
-• Распознавание фото через Vision-модели
+• Скорость ответа: 2-5 секунд
+• Распознавание фото
 
 Введите запрос или отправьте фото.
     """
     
     bot.send_message(message.chat.id, welcome, reply_markup=markup)
-    logging.info(f"👤 Новый пользователь: {message.from_user.first_name}")
-
-@bot.message_handler(commands=['help'])
-def help_command(message):
-    help_text = """
-Доступные команды:
-/start - начало работы
-/help - справка
-/clear - сброс диалога
-
-Примеры запросов:
-• 150 + 150 / 2
-• cos 30°
-• x² - 5x + 6 = 0
-• расскажи шутку
-• интересный факт
-
-Для анализа фото отправьте изображение.
-    """
-    bot.reply_to(message, help_text)
-
-@bot.message_handler(commands=['clear'])
-def clear_command(message):
-    if brain.clear_context(message.from_user.id):
-        bot.reply_to(message, "История диалога очищена")
-    else:
-        bot.reply_to(message, "История уже пуста")
 
 @bot.message_handler(content_types=['photo'])
 def handle_photo(message):
@@ -99,7 +57,6 @@ def handle_photo(message):
 
 @bot.message_handler(func=lambda m: True)
 def handle_message(message):
-    user_id = message.from_user.id
     user_text = message.text
     
     # Обработка кнопок
@@ -114,26 +71,25 @@ def handle_message(message):
     if user_text == '📊 Факт':
         user_text = "интересный факт"
     if user_text == '❓ Помощь':
-        help_command(message)
+        bot.reply_to(message, "/start - начало\n/help - помощь\n/clear - сброс")
         return
     
     bot.send_chat_action(message.chat.id, 'typing')
     status = bot.reply_to(message, "🔄 Анализ запроса...")
     
-    response = brain.get_response(user_id, user_text)
-    
-    bot.delete_message(message.chat.id, status.message_id)
-    bot.reply_to(message, response)
+    # Устанавливаем таймаут на всю операцию
+    try:
+        response = brain.get_response(message.from_user.id, user_text)
+        bot.delete_message(message.chat.id, status.message_id)
+        bot.reply_to(message, response)
+    except Exception as e:
+        bot.delete_message(message.chat.id, status.message_id)
+        bot.reply_to(message, f"Ошибка: {str(e)}")
 
 if __name__ == "__main__":
-    logging.info("=" * 80)
-    logging.info("🚀 ЗАПУСК TELEGRAM БОТА")
-    logging.info("=" * 80)
-    
+    logging.info("🚀 Бот запущен")
     try:
-        # Простой polling без бесконечного цикла
         bot.polling(non_stop=True, interval=0, timeout=20)
     except Exception as e:
-        logging.error(f"❌ Ошибка: {e}")
-    finally:
-        logging.info("👋 Бот завершил работу")
+        logging.error(f"Ошибка: {e}")
+        time.sleep(5)
