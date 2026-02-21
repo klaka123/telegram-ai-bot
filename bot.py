@@ -1,5 +1,5 @@
 """
-TELEGRAM БОТ — Стабильная версия
+TELEGRAM БОТ — С детальным прогрессом анализа
 """
 
 import os
@@ -18,6 +18,9 @@ if not TOKEN:
 
 bot = telebot.TeleBot(TOKEN)
 
+# Передаем экземпляр бота в нейросеть
+brain.set_bot(bot)
+
 @bot.message_handler(commands=['start'])
 def start(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -25,17 +28,56 @@ def start(message):
     markup.row('🎭 Шутка', '📊 Факт', '❓ Помощь')
     
     welcome = """
-АНАЛИТИЧЕСКАЯ СИСТЕМА — 30+ НЕЙРОСЕТЕЙ
+🔬 **СУПЕР-АНАЛИТИК — 30+ НЕЙРОСЕТЕЙ**
 
-Принцип работы:
-• 30+ нейросетей одновременно анализируют вопрос
-• Скорость ответа: 2-5 секунд
-• Распознавание фото
+📊 **ДЕТАЛЬНЫЙ ПРОГРЕСС:**
+• Прогресс-бар с процентами
+• Время выполнения
+• Список отвечающих моделей
+• Статистика в реальном времени
 
-Введите запрос или отправьте фото.
+🤖 **30+ МОДЕЛЕЙ:**
+• Gemini 2.0 Flash (быстрейшая)
+• NVIDIA Nemotron VL (фото)
+• Step 3.5 Flash (350 токен/сек)
+• Trinity Mini (молниеносная)
+• И ещё 25+ нейросетей
+
+📝 **Примеры:**
+• `150 + 150 / 2`
+• `cos 30°`
+• `x² - 5x + 6 = 0`
+
+Отправьте запрос или фото для анализа.
     """
     
-    bot.send_message(message.chat.id, welcome, reply_markup=markup)
+    bot.send_message(message.chat.id, welcome, reply_markup=markup, parse_mode='Markdown')
+
+@bot.message_handler(commands=['help'])
+def help_command(message):
+    help_text = """
+📚 **Доступные команды:**
+/start - начало работы
+/help - справка
+/clear - сброс диалога
+
+📝 **Примеры запросов:**
+• 150 + 150 / 2
+• cos 30°
+• x² - 5x + 6 = 0
+• расскажи шутку
+• интересный факт
+
+📸 **Фото:** отправьте изображение с примером
+    """
+    bot.reply_to(message, help_text, parse_mode='Markdown')
+
+@bot.message_handler(commands=['clear'])
+def clear_command(message):
+    if brain.clear_context(message.from_user.id):
+        bot.reply_to(message, "🧹 История диалога очищена")
+    else:
+        bot.reply_to(message, "✅ История уже пуста")
 
 @bot.message_handler(content_types=['photo'])
 def handle_photo(message):
@@ -45,15 +87,20 @@ def handle_photo(message):
         downloaded_file = bot.download_file(file_info.file_path)
         
         bot.send_chat_action(message.chat.id, 'typing')
-        status = bot.reply_to(message, "📸 Анализ фото...")
+        status = bot.reply_to(message, "📸 **Анализ фото...**\n\n⏳ Запускаю vision-нейросети...")
         
-        analysis = brain.analyze_photo(downloaded_file, message.from_user.id)
+        analysis = brain.analyze_photo(
+            downloaded_file, 
+            message.from_user.id,
+            chat_id=message.chat.id,
+            status_message_id=status.message_id
+        )
         
         bot.delete_message(message.chat.id, status.message_id)
         bot.reply_to(message, analysis)
         
     except Exception as e:
-        bot.reply_to(message, f"Ошибка: {str(e)}")
+        bot.reply_to(message, f"❌ Ошибка: {str(e)}")
 
 @bot.message_handler(func=lambda m: True)
 def handle_message(message):
@@ -61,33 +108,42 @@ def handle_message(message):
     
     # Обработка кнопок
     if user_text == '📷 Фото':
-        bot.reply_to(message, "Отправьте фото с примером")
+        bot.reply_to(message, "📸 Отправьте фото с примером для анализа")
         return
     if user_text == '📝 Пример':
-        bot.reply_to(message, "Примеры:\n• 150 + 150 / 2\n• cos 30°\n• x² - 5x + 6 = 0")
+        bot.reply_to(message, "📝 **Примеры:**\n• `150 + 150 / 2`\n• `cos 30°`\n• `x² - 5x + 6 = 0`", parse_mode='Markdown')
         return
     if user_text == '🎭 Шутка':
         user_text = "расскажи шутку"
     if user_text == '📊 Факт':
         user_text = "интересный факт"
     if user_text == '❓ Помощь':
-        bot.reply_to(message, "/start - начало\n/help - помощь\n/clear - сброс")
+        help_command(message)
         return
     
     bot.send_chat_action(message.chat.id, 'typing')
-    status = bot.reply_to(message, "🔄 Анализ запроса...")
+    status = bot.reply_to(message, "🔬 **Анализ запроса...**\n\n⏳ Запускаю 30+ нейросетей...")
     
     try:
-        response = brain.get_response(message.from_user.id, user_text)
+        response = brain.get_response(
+            message.from_user.id, 
+            user_text,
+            chat_id=message.chat.id,
+            status_message_id=status.message_id
+        )
+        
         bot.delete_message(message.chat.id, status.message_id)
         bot.reply_to(message, response)
     except Exception as e:
         bot.delete_message(message.chat.id, status.message_id)
-        bot.reply_to(message, f"Ошибка: {str(e)}")
+        bot.reply_to(message, f"❌ Ошибка: {str(e)}")
 
 if __name__ == "__main__":
-    logging.info("🚀 Бот запущен")
+    logging.info("=" * 80)
+    logging.info("🚀 ЗАПУСК TELEGRAM БОТА — ДЕТАЛЬНЫЙ ПРОГРЕСС")
+    logging.info("=" * 80)
+    
     try:
         bot.polling(non_stop=True, interval=0, timeout=20)
     except Exception as e:
-        logging.error(f"Ошибка: {e}")
+        logging.error(f"❌ Ошибка: {e}")
