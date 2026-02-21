@@ -1,6 +1,6 @@
 """
 АНАЛИТИЧЕСКАЯ СИСТЕМА — 31 НЕЙРОСЕТЬ
-Умный выбор моделей в зависимости от сложности вопроса
+Максимальная скорость для простых вопросов
 """
 
 import os
@@ -16,7 +16,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 class SuperBot:
     def __init__(self):
         logging.info("=" * 80)
-        logging.info("ЗАПУСК АНАЛИТИЧЕСКОЙ СИСТЕМЫ — 31 НЕЙРОСЕТЬ")
+        logging.info("ЗАПУСК АНАЛИТИЧЕСКОЙ СИСТЕМЫ")
         logging.info("=" * 80)
         
         self.api_key = os.environ.get('OPENROUTER_KEY')
@@ -25,62 +25,58 @@ class SuperBot:
         if not self.api_key:
             logging.error("❌ API ключ не найден!")
         
-        # === ⚡ СВЕРХБЫСТРЫЕ МОДЕЛИ (до 4 сек) — для простых вопросов ===
+        # === ⚡ СВЕРХБЫСТРЫЕ МОДЕЛИ (1-2 сек) ===
         self.fast_models = [
-            {"name": "stepfun/step-3.5-flash:free", "timeout": 4, "desc": "Step 3.5 Flash", "speed": 0.98},
-            {"name": "arcee-ai/trinity-mini:free", "timeout": 4, "desc": "Trinity Mini", "speed": 0.97},
-            {"name": "liquidai/lfm2.5-1.2b-thinking:free", "timeout": 4, "desc": "LFM2.5 Thinking", "speed": 0.96},
-            {"name": "mistralai/mistral-7b-v3:free", "timeout": 4, "desc": "Mistral 7B v3", "speed": 0.95},
-            {"name": "z-ai/glm-4.5-air:free", "timeout": 4, "desc": "GLM-4.5-Air", "speed": 0.94},
-            {"name": "liquidai/lfm2.5-1.2b-instruct:free", "timeout": 4, "desc": "LFM2.5 Instruct", "speed": 0.95},
+            {"name": "stepfun/step-3.5-flash:free", "timeout": 2, "desc": "Step 3.5 Flash"},
+            {"name": "arcee-ai/trinity-mini:free", "timeout": 2, "desc": "Trinity Mini"},
+            {"name": "liquidai/lfm2.5-1.2b-thinking:free", "timeout": 2, "desc": "LFM2.5 Thinking"},
+            {"name": "mistralai/mistral-7b-v3:free", "timeout": 2, "desc": "Mistral 7B v3"},
+            {"name": "z-ai/glm-4.5-air:free", "timeout": 2, "desc": "GLM-4.5-Air"},
+            {"name": "liquidai/lfm2.5-1.2b-instruct:free", "timeout": 2, "desc": "LFM2.5 Instruct"},
         ]
         
-        # === 🧠 МОЩНЫЕ УНИВЕРСАЛЬНЫЕ МОДЕЛИ — для сложных вопросов ===
+        # === 🧠 МОЩНЫЕ МОДЕЛИ (для сложных вопросов) ===
         self.powerful_models = [
-            {"name": "google/gemini-2.0-flash-exp:free", "timeout": 6, "desc": "Gemini 2.0 Flash", "speed": 0.9},
-            {"name": "meta-llama/llama-3.3-70b-instruct:free", "timeout": 7, "desc": "Llama 3.3 70B", "speed": 0.85},
-            {"name": "arcee-ai/trinity-large-preview:free", "timeout": 8, "desc": "Trinity Large", "speed": 0.82},
-            {"name": "openai/gpt-oss-120b:free", "timeout": 7, "desc": "GPT-OSS 120B", "speed": 0.83},
-            {"name": "deepseek/deepseek-r1:free", "timeout": 8, "desc": "DeepSeek R1", "speed": 0.81},
-            {"name": "upstage/solar-pro-3:free", "timeout": 7, "desc": "Solar Pro 3", "speed": 0.84},
-            {"name": "qwen/qwen3-235b-a22b-thinking:free", "timeout": 8, "desc": "Qwen3 235B", "speed": 0.8},
-            {"name": "nvidia/nemotron-3-nano-30b:free", "timeout": 7, "desc": "Nemotron 3 Nano", "speed": 0.82},
-            {"name": "mistralai/devstral-2512:free", "timeout": 6, "desc": "Devstral 2", "speed": 0.86},
-            {"name": "openrouter/aurora-alpha:free", "timeout": 6, "desc": "Aurora Alpha", "speed": 0.87},
-            {"name": "openrouter/pony-alpha:free", "timeout": 7, "desc": "Pony Alpha", "speed": 0.84},
-            {"name": "xiaomi/mimo-v2-flash:free", "timeout": 6, "desc": "MiMo-V2-Flash", "speed": 0.86},
-            {"name": "qwen/qwen3-coder-480b:free", "timeout": 8, "desc": "Qwen3 Coder", "speed": 0.79},
+            {"name": "google/gemini-2.0-flash-exp:free", "timeout": 8, "desc": "Gemini 2.0 Flash"},
+            {"name": "meta-llama/llama-3.3-70b-instruct:free", "timeout": 10, "desc": "Llama 3.3 70B"},
+            {"name": "arcee-ai/trinity-large-preview:free", "timeout": 10, "desc": "Trinity Large"},
+            {"name": "openai/gpt-oss-120b:free", "timeout": 8, "desc": "GPT-OSS 120B"},
+            {"name": "deepseek/deepseek-r1:free", "timeout": 10, "desc": "DeepSeek R1"},
+            {"name": "upstage/solar-pro-3:free", "timeout": 8, "desc": "Solar Pro 3"},
+            {"name": "qwen/qwen3-235b-a22b-thinking:free", "timeout": 10, "desc": "Qwen3 235B"},
+            {"name": "nvidia/nemotron-3-nano-30b:free", "timeout": 8, "desc": "Nemotron 3 Nano"},
+            {"name": "mistralai/devstral-2512:free", "timeout": 6, "desc": "Devstral 2"},
+            {"name": "openrouter/aurora-alpha:free", "timeout": 6, "desc": "Aurora Alpha"},
+            {"name": "openrouter/pony-alpha:free", "timeout": 8, "desc": "Pony Alpha"},
+            {"name": "xiaomi/mimo-v2-flash:free", "timeout": 6, "desc": "MiMo-V2-Flash"},
+            {"name": "qwen/qwen3-coder-480b:free", "timeout": 10, "desc": "Qwen3 Coder"},
         ]
         
-        # === 📸 VISION МОДЕЛИ (для фото) ===
+        # === 📸 VISION МОДЕЛИ ===
         self.vision_models = [
-            {"name": "google/gemini-2.0-flash-exp:free", "timeout": 6, "desc": "Gemini 2.0 Flash", "vision": True},
-            {"name": "nvidia/nemotron-nano-2-vl:free", "timeout": 7, "desc": "NVIDIA Nemotron VL", "vision": True},
-            {"name": "qwen/qwen3-vl-235b-a22b-thinking:free", "timeout": 8, "desc": "Qwen3 VL 235B", "vision": True},
-            {"name": "google/gemini-3-flash-preview:free", "timeout": 6, "desc": "Gemini 3 Flash", "vision": True},
-            {"name": "moonshotai/kimi-vl-a3b-thinking:free", "timeout": 6, "desc": "Kimi VL A3B", "vision": True},
-            {"name": "google/gemma-3-27b:free", "timeout": 7, "desc": "Gemma 3 27B", "vision": True},
+            {"name": "google/gemini-2.0-flash-exp:free", "timeout": 8, "desc": "Gemini 2.0 Flash"},
+            {"name": "nvidia/nemotron-nano-2-vl:free", "timeout": 8, "desc": "NVIDIA Nemotron VL"},
+            {"name": "qwen/qwen3-vl-235b-a22b-thinking:free", "timeout": 10, "desc": "Qwen3 VL 235B"},
+            {"name": "google/gemini-3-flash-preview:free", "timeout": 8, "desc": "Gemini 3 Flash"},
+            {"name": "moonshotai/kimi-vl-a3b-thinking:free", "timeout": 6, "desc": "Kimi VL A3B"},
+            {"name": "google/gemma-3-27b:free", "timeout": 8, "desc": "Gemma 3 27B"},
         ]
         
-        logging.info(f"⚡ СВЕРХБЫСТРЫХ МОДЕЛЕЙ: {len(self.fast_models)}")
-        logging.info(f"🧠 МОЩНЫХ МОДЕЛЕЙ: {len(self.powerful_models)}")
-        logging.info(f"📸 VISION МОДЕЛЕЙ: {len(self.vision_models)}")
-        logging.info(f"📊 ВСЕГО: {len(self.fast_models) + len(self.powerful_models)}")
+        logging.info(f"⚡ СВЕРХБЫСТРЫХ: {len(self.fast_models)}")
+        logging.info(f"🧠 МОЩНЫХ: {len(self.powerful_models)}")
+        logging.info(f"📸 VISION: {len(self.vision_models)}")
         logging.info("=" * 80)
         
         self.user_contexts = {}
     
     def set_bot(self, bot):
-        """Устанавливает экземпляр бота"""
         self.bot_instance = bot
     
     def is_complex_question(self, text):
         """Определяет сложность вопроса"""
-        # Длинные вопросы (>100 символов) считаются сложными
-        if len(text) > 100:
+        if len(text) > 150:
             return True
         
-        # Ключевые слова, требующие мощных моделей
         complex_keywords = [
             'объясни', 'почему', 'как работает', 'сравни', 
             'проанализируй', 'напиши код', 'формула', 
@@ -93,25 +89,9 @@ class SuperBot:
         text_lower = text.lower()
         return any(keyword in text_lower for keyword in complex_keywords)
     
-    def format_time(self, seconds):
-        """Форматирует время"""
-        if seconds < 60:
-            return f"{seconds:.1f} сек"
-        else:
-            minutes = int(seconds // 60)
-            secs = seconds % 60
-            return f"{minutes} мин {secs:.0f} сек"
-    
-    def create_progress_bar(self, percent, width=25):
-        """Создает прогресс-бар"""
-        filled = int(width * percent / 100)
-        return "█" * filled + "░" * (width - filled)
-    
     def ask_model(self, model_config, messages):
         """Запрос к модели"""
         try:
-            start = time.time()
-            
             response = requests.post(
                 url="https://openrouter.ai/api/v1/chat/completions",
                 headers={
@@ -127,132 +107,124 @@ class SuperBot:
                 timeout=model_config["timeout"]
             )
             
-            elapsed = time.time() - start
-            
             if response.status_code == 200:
                 result = response.json()
                 return {
                     "success": True,
                     "answer": result["choices"][0]["message"]["content"],
-                    "time": elapsed,
                     "desc": model_config["desc"]
                 }
-            else:
-                return {"success": False, "time": elapsed, "desc": model_config["desc"]}
+            return {"success": False}
                     
-        except Exception as e:
-            return {"success": False, "time": 0, "desc": model_config["desc"]}
+        except Exception:
+            return {"success": False}
+    
+    def update_progress(self, chat_id, message_id, current, total, model_type, responses_count):
+        """Обновляет прогресс-бар"""
+        if not self.bot_instance:
+            return
+        
+        try:
+            percent = int((current / total) * 100)
+            bar_length = 20
+            filled = int(bar_length * percent / 100)
+            bar = "█" * filled + "░" * (bar_length - filled)
+            
+            status_text = f"""
+🔬 **АНАЛИЗ {'СЛОЖНОГО' if model_type == '🧠' else 'ПРОСТОГО'} ЗАПРОСА**
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 **ПРОГРЕСС:** [{bar}] {percent}% ({current}/{total})
+⚡ **ТИП МОДЕЛЕЙ:** {'🧠 МОЩНЫЕ' if model_type == '🧠' else '⚡ БЫСТРЫЕ'}
+✅ **НАЙДЕНО РЕШЕНИЙ:** {responses_count}
+"""
+            self.bot_instance.edit_message_text(
+                chat_id=chat_id,
+                message_id=message_id,
+                text=status_text
+            )
+        except:
+            pass
     
     def get_response(self, user_id, message, chat_id=None, status_message_id=None):
-        """Получение ответа с умным выбором моделей"""
+        """Получение ответа"""
         
         if not self.api_key:
             return "Ошибка: не найден API ключ OpenRouter"
         
-        # Определяем сложность вопроса
+        # Определяем сложность
         complex_question = self.is_complex_question(message)
         
         # Системный промпт
         system_prompt = "Ты — аналитическая нейросеть. Отвечай точно и по существу. Приоритет операций: сначала умножение/деление."
-        if complex_question:
-            system_prompt += " Вопрос сложный, требуется развернутый ответ."
-        
         messages = [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": message}
         ]
         
-        start_time = time.time()
-        
-        # Выбираем модели в зависимости от сложности
+        # Выбираем модели
         if complex_question:
-            # Для сложных вопросов: быстрые (2) + мощные (6)
-            models_to_use = self.fast_models[:2] + self.powerful_models[:6]
-            model_type = "🧠 МОЩНЫЕ"
+            # Сложные: сначала быстрые (для скорости), потом мощные
+            models_to_try = self.fast_models[:2] + self.powerful_models[:6]
+            model_type = "🧠"
+            type_name = "МОЩНЫЕ"
         else:
-            # Для простых вопросов: только быстрые (6)
-            models_to_use = self.fast_models[:6]
-            model_type = "⚡ БЫСТРЫЕ"
+            # Простые: только сверхбыстрые
+            models_to_try = self.fast_models[:3]
+            model_type = "⚡"
+            type_name = "БЫСТРЫЕ"
         
-        total_models = len(models_to_use)
+        total = len(models_to_try)
         processed = 0
         responses = []
         
-        logging.info(f"📝 Запрос: {message[:50]}...")
-        logging.info(f"🤖 Тип: {model_type}, моделей: {total_models}")
-        
         # Опрашиваем модели
-        for i, model in enumerate(models_to_use):
+        for i, model in enumerate(models_to_try):
             processed += 1
             
+            # Обновляем прогресс
+            if chat_id and status_message_id:
+                self.update_progress(chat_id, status_message_id, processed, total, model_type, len(responses))
+            
+            # Запрашиваем модель
             result = self.ask_model(model, messages)
             
             if result.get("success"):
                 responses.append({
                     "answer": result["answer"],
-                    "model": result["desc"],
-                    "time": result["time"]
+                    "model": result["desc"]
                 })
-            
-            # Обновляем прогресс
-            if chat_id and status_message_id and i % 2 == 0:
-                elapsed = time.time() - start_time
-                percent = (processed / total_models) * 100
-                avg_time = elapsed / processed if processed > 0 else 0
-                
-                bar = self.create_progress_bar(percent)
-                status_text = f"""
-🔬 **{'СЛОЖНЫЙ ВОПРОС' if complex_question else 'ПРОСТОЙ ВОПРОС'}**
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📊 **ПРОГРЕСС:** [{bar}] {percent:.0f}% ({processed}/{total_models})
-⏱️ **ПРОШЛО:** {self.format_time(elapsed)}
-⚡ **ТИП МОДЕЛЕЙ:** {model_type}
-
-✅ **НАЙДЕНО РЕШЕНИЙ:** {len(responses)}
-⏳ **ОСТАЛОСЬ:** {total_models - processed}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⚙️ **СРЕДНЕЕ ВРЕМЯ:** {avg_time:.1f} сек
-"""
+                # Для простых вопросов берем первый ответ
+                if not complex_question and len(responses) == 1:
+                    # Удаляем статусное сообщение
+                    if chat_id and status_message_id:
+                        try:
+                            self.bot_instance.delete_message(chat_id, status_message_id)
+                        except:
+                            pass
+                    return responses[0]["answer"]
+        
+        # Для сложных вопросов ждем все ответы и берем лучший
+        if responses:
+            # Удаляем статусное сообщение
+            if chat_id and status_message_id:
                 try:
-                    self.bot_instance.edit_message_text(
-                        chat_id=chat_id,
-                        message_id=status_message_id,
-                        text=status_text
-                    )
+                    self.bot_instance.delete_message(chat_id, status_message_id)
                 except:
                     pass
+            return responses[0]["answer"]
         
-        if not responses:
-            return "Ошибка: нейросети временно недоступны"
-        
-        # Формируем финальный ответ
-        elapsed = time.time() - start_time
-        
-        # Берем первый успешный ответ (самый быстрый)
-        final_answer = responses[0]["answer"]
-        
-        # Добавляем статистику
-        final_answer += f"\n\n━━━━━━━━━━━━━━━━━━━━━━━━\n"
-        final_answer += f"📊 **Статистика:**\n"
-        final_answer += f"• Тип: {'🧠 сложный' if complex_question else '⚡ простой'}\n"
-        final_answer += f"• Моделей: {len(responses)}/{total_models}\n"
-        final_answer += f"• Время: {elapsed:.1f} сек\n"
-        
-        # Добавляем кто ответил первым
-        final_answer += f"• Первый ответ: {responses[0]['model']} ({responses[0]['time']:.1f} сек)"
-        
-        return final_answer
+        return "Ошибка: нейросети временно недоступны"
     
     def analyze_photo(self, photo_bytes, user_id, chat_id=None, status_message_id=None):
-        """Анализ фото (всегда vision-модели)"""
+        """Анализ фото"""
         try:
             base64_image = base64.b64encode(photo_bytes).decode('utf-8')
             
             messages = [
                 {
                     "role": "system",
-                    "content": "Найди на фото все математические примеры и реши их подробно."
+                    "content": "Найди на фото все математические примеры и реши их."
                 },
                 {
                     "role": "user",
@@ -267,36 +239,25 @@ class SuperBot:
                 }
             ]
             
-            start_time = time.time()
-            total = len(self.vision_models)
+            models_to_try = self.vision_models[:4]
+            total = len(models_to_try)
             processed = 0
             responses = []
             
-            for i, model in enumerate(self.vision_models):
+            for i, model in enumerate(models_to_try):
                 processed += 1
-                result = self.ask_model(model, messages)
                 
-                if result.get("success"):
-                    responses.append({
-                        "answer": result["answer"],
-                        "model": result["desc"],
-                        "time": result["time"]
-                    })
-                
-                # Обновляем прогресс
-                if chat_id and status_message_id and i % 1 == 0:
-                    elapsed = time.time() - start_time
-                    percent = (processed / total) * 100
-                    bar = self.create_progress_bar(percent)
+                if chat_id and status_message_id:
+                    percent = int((processed / total) * 100)
+                    bar_length = 20
+                    filled = int(bar_length * percent / 100)
+                    bar = "█" * filled + "░" * (bar_length - filled)
                     
                     status_text = f"""
-📸 **VISION АНАЛИЗ ФОТО**
+📸 **АНАЛИЗ ФОТО**
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-📊 **ПРОГРЕСС:** [{bar}] {percent:.0f}% ({processed}/{total})
-⏱️ **ПРОШЛО:** {self.format_time(elapsed)}
-✅ **НАЙДЕНО РЕШЕНИЙ:** {len(responses)}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 **ПРОГРЕСС:** [{bar}] {percent}% ({processed}/{total})
 ⚡ **ОБРАБОТКА ИЗОБРАЖЕНИЯ...**
 """
                     try:
@@ -307,19 +268,20 @@ class SuperBot:
                         )
                     except:
                         pass
+                
+                result = self.ask_model(model, messages)
+                if result.get("success"):
+                    responses.append(result["answer"])
             
-            if not responses:
-                return "Не удалось проанализировать фото"
+            if chat_id and status_message_id:
+                try:
+                    self.bot_instance.delete_message(chat_id, status_message_id)
+                except:
+                    pass
             
-            elapsed = time.time() - start_time
-            final = responses[0]["answer"]
-            final += f"\n\n━━━━━━━━━━━━━━━━━━━━━━━━\n"
-            final += f"📸 **Vision анализ:**\n"
-            final += f"• Моделей: {len(responses)}/{total}\n"
-            final += f"• Время: {elapsed:.1f} сек\n"
-            final += f"• Первый ответ: {responses[0]['model']}"
-            
-            return final
+            if responses:
+                return responses[0]
+            return "Не удалось проанализировать фото"
             
         except Exception as e:
             return f"Ошибка: {str(e)}"
