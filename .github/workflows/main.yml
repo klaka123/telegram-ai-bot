@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '*/1 * * * *'  # Запуск КАЖДУЮ МИНУТУ для 24/7 работы
   workflow_dispatch:
 
 jobs:
@@ -29,4 +29,4 @@ jobs:
         BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
         OPENROUTER_KEY: ${{ secrets.OPENROUTER_KEY }}
       run: python bot.py
-      timeout-minutes: 6
+      timeout-minutes: 5  # Увеличено до 5 минут
