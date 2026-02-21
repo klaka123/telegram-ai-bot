@@ -1,6 +1,6 @@
 """
 АНАЛИТИЧЕСКАЯ СИСТЕМА — 31 НЕЙРОСЕТЬ
-Максимальная скорость для простых вопросов
+Красивое оформление, максимальная скорость
 """
 
 import os
@@ -15,15 +15,15 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 class SuperBot:
     def __init__(self):
-        logging.info("=" * 80)
-        logging.info("ЗАПУСК АНАЛИТИЧЕСКОЙ СИСТЕМЫ")
-        logging.info("=" * 80)
+        print("\n" + "="*60)
+        print("🔬 ЗАПУСК АНАЛИТИЧЕСКОЙ СИСТЕМЫ — 31 НЕЙРОСЕТЬ")
+        print("="*60 + "\n")
         
         self.api_key = os.environ.get('OPENROUTER_KEY')
         self.bot_instance = None
         
         if not self.api_key:
-            logging.error("❌ API ключ не найден!")
+            print("❌ ОШИБКА: API ключ не найден!")
         
         # === ⚡ СВЕРХБЫСТРЫЕ МОДЕЛИ (1-2 сек) ===
         self.fast_models = [
@@ -35,7 +35,7 @@ class SuperBot:
             {"name": "liquidai/lfm2.5-1.2b-instruct:free", "timeout": 2, "desc": "LFM2.5 Instruct"},
         ]
         
-        # === 🧠 МОЩНЫЕ МОДЕЛИ (для сложных вопросов) ===
+        # === 🧠 МОЩНЫЕ МОДЕЛИ ===
         self.powerful_models = [
             {"name": "google/gemini-2.0-flash-exp:free", "timeout": 8, "desc": "Gemini 2.0 Flash"},
             {"name": "meta-llama/llama-3.3-70b-instruct:free", "timeout": 10, "desc": "Llama 3.3 70B"},
@@ -44,12 +44,6 @@ class SuperBot:
             {"name": "deepseek/deepseek-r1:free", "timeout": 10, "desc": "DeepSeek R1"},
             {"name": "upstage/solar-pro-3:free", "timeout": 8, "desc": "Solar Pro 3"},
             {"name": "qwen/qwen3-235b-a22b-thinking:free", "timeout": 10, "desc": "Qwen3 235B"},
-            {"name": "nvidia/nemotron-3-nano-30b:free", "timeout": 8, "desc": "Nemotron 3 Nano"},
-            {"name": "mistralai/devstral-2512:free", "timeout": 6, "desc": "Devstral 2"},
-            {"name": "openrouter/aurora-alpha:free", "timeout": 6, "desc": "Aurora Alpha"},
-            {"name": "openrouter/pony-alpha:free", "timeout": 8, "desc": "Pony Alpha"},
-            {"name": "xiaomi/mimo-v2-flash:free", "timeout": 6, "desc": "MiMo-V2-Flash"},
-            {"name": "qwen/qwen3-coder-480b:free", "timeout": 10, "desc": "Qwen3 Coder"},
         ]
         
         # === 📸 VISION МОДЕЛИ ===
@@ -59,13 +53,12 @@ class SuperBot:
             {"name": "qwen/qwen3-vl-235b-a22b-thinking:free", "timeout": 10, "desc": "Qwen3 VL 235B"},
             {"name": "google/gemini-3-flash-preview:free", "timeout": 8, "desc": "Gemini 3 Flash"},
             {"name": "moonshotai/kimi-vl-a3b-thinking:free", "timeout": 6, "desc": "Kimi VL A3B"},
-            {"name": "google/gemma-3-27b:free", "timeout": 8, "desc": "Gemma 3 27B"},
         ]
         
-        logging.info(f"⚡ СВЕРХБЫСТРЫХ: {len(self.fast_models)}")
-        logging.info(f"🧠 МОЩНЫХ: {len(self.powerful_models)}")
-        logging.info(f"📸 VISION: {len(self.vision_models)}")
-        logging.info("=" * 80)
+        print(f"⚡ СВЕРХБЫСТРЫХ: {len(self.fast_models)}")
+        print(f"🧠 МОЩНЫХ: {len(self.powerful_models)}")
+        print(f"📸 VISION: {len(self.vision_models)}")
+        print("="*60 + "\n")
         
         self.user_contexts = {}
     
@@ -80,10 +73,9 @@ class SuperBot:
         complex_keywords = [
             'объясни', 'почему', 'как работает', 'сравни', 
             'проанализируй', 'напиши код', 'формула', 
-            'закон', 'теорема', 'докажи', 'research',
-            'алгоритм', 'архитектура', 'концепция',
-            'разница между', 'преимущества и недостатки',
-            'история', 'философия', 'научный'
+            'закон', 'теорема', 'докажи', 'алгоритм',
+            'архитектура', 'концепция', 'разница между',
+            'преимущества и недостатки', 'история', 'философия'
         ]
         
         text_lower = text.lower()
@@ -120,7 +112,7 @@ class SuperBot:
             return {"success": False}
     
     def update_progress(self, chat_id, message_id, current, total, model_type, responses_count):
-        """Обновляет прогресс-бар"""
+        """Обновляет прогресс-бар с красивым оформлением"""
         if not self.bot_instance:
             return
         
@@ -130,27 +122,38 @@ class SuperBot:
             filled = int(bar_length * percent / 100)
             bar = "█" * filled + "░" * (bar_length - filled)
             
+            if model_type == "⚡":
+                title = "⚡ ПРОСТОЙ ЗАПРОС"
+                model_desc = "⚡ БЫСТРЫЕ МОДЕЛИ"
+            else:
+                title = "🧠 СЛОЖНЫЙ ЗАПРОС"
+                model_desc = "🧠 МОЩНЫЕ МОДЕЛИ"
+            
             status_text = f"""
-🔬 **АНАЛИЗ {'СЛОЖНОГО' if model_type == '🧠' else 'ПРОСТОГО'} ЗАПРОСА**
+🔬 **{title}**
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-📊 **ПРОГРЕСС:** [{bar}] {percent}% ({current}/{total})
-⚡ **ТИП МОДЕЛЕЙ:** {'🧠 МОЩНЫЕ' if model_type == '🧠' else '⚡ БЫСТРЫЕ'}
-✅ **НАЙДЕНО РЕШЕНИЙ:** {responses_count}
+📊 **ПРОГРЕСС:**  `[{bar}]`  **{percent}%**  ({current}/{total})
+
+⚡ **ТИП МОДЕЛЕЙ:**  {model_desc}
+
+✅ **НАЙДЕНО РЕШЕНИЙ:**  {responses_count}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 """
             self.bot_instance.edit_message_text(
                 chat_id=chat_id,
                 message_id=message_id,
-                text=status_text
+                text=status_text,
+                parse_mode='Markdown'
             )
-        except:
-            pass
+        except Exception as e:
+            logging.error(f"Ошибка обновления статуса: {e}")
     
     def get_response(self, user_id, message, chat_id=None, status_message_id=None):
-        """Получение ответа"""
+        """Получение ответа с красивым прогрессом"""
         
         if not self.api_key:
-            return "Ошибка: не найден API ключ OpenRouter"
+            return "❌ Ошибка: не найден API ключ OpenRouter"
         
         # Определяем сложность
         complex_question = self.is_complex_question(message)
@@ -164,17 +167,14 @@ class SuperBot:
         
         # Выбираем модели
         if complex_question:
-            # Сложные: сначала быстрые (для скорости), потом мощные
             models_to_try = self.fast_models[:2] + self.powerful_models[:6]
             model_type = "🧠"
-            type_name = "МОЩНЫЕ"
+            total = len(models_to_try)
         else:
-            # Простые: только сверхбыстрые
             models_to_try = self.fast_models[:3]
             model_type = "⚡"
-            type_name = "БЫСТРЫЕ"
+            total = len(models_to_try)
         
-        total = len(models_to_try)
         processed = 0
         responses = []
         
@@ -194,9 +194,9 @@ class SuperBot:
                     "answer": result["answer"],
                     "model": result["desc"]
                 })
-                # Для простых вопросов берем первый ответ
+                
+                # Для простых вопросов берем первый ответ сразу
                 if not complex_question and len(responses) == 1:
-                    # Удаляем статусное сообщение
                     if chat_id and status_message_id:
                         try:
                             self.bot_instance.delete_message(chat_id, status_message_id)
@@ -204,9 +204,8 @@ class SuperBot:
                             pass
                     return responses[0]["answer"]
         
-        # Для сложных вопросов ждем все ответы и берем лучший
+        # Для сложных вопросов ждем все ответы
         if responses:
-            # Удаляем статусное сообщение
             if chat_id and status_message_id:
                 try:
                     self.bot_instance.delete_message(chat_id, status_message_id)
@@ -214,10 +213,10 @@ class SuperBot:
                     pass
             return responses[0]["answer"]
         
-        return "Ошибка: нейросети временно недоступны"
+        return "❌ Ошибка: нейросети временно недоступны"
     
     def analyze_photo(self, photo_bytes, user_id, chat_id=None, status_message_id=None):
-        """Анализ фото"""
+        """Анализ фото с красивым прогрессом"""
         try:
             base64_image = base64.b64encode(photo_bytes).decode('utf-8')
             
@@ -257,14 +256,17 @@ class SuperBot:
 📸 **АНАЛИЗ ФОТО**
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-📊 **ПРОГРЕСС:** [{bar}] {percent}% ({processed}/{total})
-⚡ **ОБРАБОТКА ИЗОБРАЖЕНИЯ...**
+📊 **ПРОГРЕСС:**  `[{bar}]`  **{percent}%**  ({processed}/{total})
+
+🔍 **ОБРАБОТКА ИЗОБРАЖЕНИЯ...**
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 """
                     try:
                         self.bot_instance.edit_message_text(
                             chat_id=chat_id,
                             message_id=status_message_id,
-                            text=status_text
+                            text=status_text,
+                            parse_mode='Markdown'
                         )
                     except:
                         pass
@@ -281,10 +283,10 @@ class SuperBot:
             
             if responses:
                 return responses[0]
-            return "Не удалось проанализировать фото"
+            return "❌ Не удалось проанализировать фото"
             
         except Exception as e:
-            return f"Ошибка: {str(e)}"
+            return f"❌ Ошибка: {str(e)}"
     
     def clear_context(self, user_id):
         if user_id in self.user_contexts:
