@@ -1,5 +1,5 @@
 """
-TELEGRAM БОТ — Умный выбор нейросетей
+TELEGRAM БОТ — Максимальная скорость для простых вопросов
 """
 
 import os
@@ -21,36 +21,56 @@ brain.set_bot(bot)
 @bot.message_handler(commands=['start'])
 def start(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    markup.row('📷 Фото', '📝 Пример', '🧠 Сложный вопрос')
+    markup.row('📷 Фото', '📝 Примеры')
     markup.row('🎭 Шутка', '📊 Факт', '❓ Помощь')
     
     welcome = """
 🔬 **ИНТЕЛЛЕКТУАЛЬНАЯ СИСТЕМА — 31 НЕЙРОСЕТЬ**
 
-⚡ **БЫСТРЫЕ МОДЕЛИ** (для простых вопросов):
-• Step 3.5 Flash (2-3 сек)
-• Trinity Mini (3-4 сек)
-• Mistral 7B (4-5 сек)
+⚡ **ПРОСТЫЕ ВОПРОСЫ** (1-2 секунды):
+• 150 + 150 / 2
+• cos 30°
+• расскажи шутку
 
-🧠 **МОЩНЫЕ МОДЕЛИ** (для сложных задач):
-• Gemini 2.0 Flash (1M контекста)
-• Llama 3.3 70B (GPT-4 уровень)
-• DeepSeek R1 (математика)
-• Qwen3 235B (наука)
+🧠 **СЛОЖНЫЕ ВОПРОСЫ** (наука, логика):
+• Объясни теорию относительности
+• Напиши код сортировки
+• В чем смысл жизни?
 
-📸 **VISION МОДЕЛИ** (для фото):
-• Gemini 2.0 Flash (быстрейшая)
-• NVIDIA Nemotron VL (OCR)
-• Qwen3 VL (видео/фото)
+📸 **ФОТО** (любые примеры)
 
-📝 **Примеры:**
-• Простой: `150 + 150 / 2`
-• Сложный: `Объясни теорию относительности`
-
-Система сама выберет лучшие модели для вашего вопроса!
+Система сама выберет лучшие модели!
     """
     
-    bot.send_message(message.chat.id, welcome, reply_markup=markup, parse_mode='Markdown')
+    bot.send_message(message.chat.id, welcome, reply_markup=markup)
+
+@bot.message_handler(commands=['help'])
+def help_command(message):
+    help_text = """
+❓ **Помощь:**
+
+📝 **Примеры простых запросов:**
+• 150 + 150 / 2
+• cos 30°
+• x² - 5x + 6 = 0
+• расскажи шутку
+• интересный факт
+
+🧠 **Примеры сложных запросов:**
+• Объясни теорию относительности
+• Напиши код быстрой сортировки на Python
+• В чем разница между ИИ и машинным обучением?
+
+📸 **Фото:** отправьте изображение с примером
+    """
+    bot.reply_to(message, help_text)
+
+@bot.message_handler(commands=['clear'])
+def clear_command(message):
+    if brain.clear_context(message.from_user.id):
+        bot.reply_to(message, "🧹 История очищена")
+    else:
+        bot.reply_to(message, "✅ История пуста")
 
 @bot.message_handler(content_types=['photo'])
 def handle_photo(message):
@@ -60,7 +80,7 @@ def handle_photo(message):
         downloaded_file = bot.download_file(file_info.file_path)
         
         bot.send_chat_action(message.chat.id, 'typing')
-        status = bot.reply_to(message, "📸 **Анализ фото...**\n\nЗапускаю vision-нейросети...")
+        status = bot.reply_to(message, "📸 **Анализ фото...**")
         
         analysis = brain.analyze_photo(
             downloaded_file, 
@@ -69,7 +89,6 @@ def handle_photo(message):
             status_message_id=status.message_id
         )
         
-        bot.delete_message(message.chat.id, status.message_id)
         bot.reply_to(message, analysis)
         
     except Exception as e:
@@ -81,24 +100,21 @@ def handle_message(message):
     
     # Обработка кнопок
     if user_text == '📷 Фото':
-        bot.reply_to(message, "📸 Отправьте фото с примером для анализа")
+        bot.reply_to(message, "📸 Отправьте фото с примером")
         return
-    if user_text == '📝 Пример':
-        bot.reply_to(message, "📝 **Примеры:**\n• Простой: `150 + 150 / 2`\n• Сложный: `Объясни теорию относительности`", parse_mode='Markdown')
-        return
-    if user_text == '🧠 Сложный вопрос':
-        bot.reply_to(message, "🧠 Задайте сложный вопрос (наука, философия, математика). Будут использованы мощные модели.")
+    if user_text == '📝 Примеры':
+        bot.reply_to(message, "📝 **Примеры:**\n• Простой: `150 + 150 / 2`\n• Сложный: `Объясни теорию относительности`")
         return
     if user_text == '🎭 Шутка':
         user_text = "расскажи шутку"
     if user_text == '📊 Факт':
         user_text = "интересный факт"
     if user_text == '❓ Помощь':
-        bot.reply_to(message, "❓ /start - начало\n📷 Фото - анализ изображения\n🧠 Сложный вопрос - для сложных тем")
+        help_command(message)
         return
     
     bot.send_chat_action(message.chat.id, 'typing')
-    status = bot.reply_to(message, "🔬 **Анализ запроса...**\n\nОпределяю сложность и выбираю модели...")
+    status = bot.reply_to(message, "🔬 **Анализ запроса...**")
     
     try:
         response = brain.get_response(
@@ -108,15 +124,13 @@ def handle_message(message):
             status_message_id=status.message_id
         )
         
-        bot.delete_message(message.chat.id, status.message_id)
         bot.reply_to(message, response)
     except Exception as e:
-        bot.delete_message(message.chat.id, status.message_id)
         bot.reply_to(message, f"❌ Ошибка: {str(e)}")
 
 if __name__ == "__main__":
     logging.info("=" * 80)
-    logging.info("🚀 ЗАПУСК БОТА — 31 НЕЙРОСЕТЬ, УМНЫЙ ВЫБОР")
+    logging.info("🚀 ЗАПУСК БОТА — 31 НЕЙРОСЕТЬ")
     logging.info("=" * 80)
     
     try:
