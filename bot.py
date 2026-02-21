@@ -1,5 +1,5 @@
 """
-TELEGRAM БОТ — АНАЛИТИЧЕСКАЯ СИСТЕМА
+TELEGRAM БОТ — 30+ НЕЙРОСЕТЕЙ, БЫСТРЫЙ АНАЛИЗ
 """
 
 import os
@@ -22,17 +22,18 @@ def start(message):
     markup.row('🎭 Шутка', '📊 Факт', '❓ Помощь')
     
     welcome = """
-АНАЛИТИЧЕСКАЯ СИСТЕМА — 20+ НЕЙРОСЕТЕЙ
+АНАЛИТИЧЕСКАЯ СИСТЕМА — 30+ НЕЙРОСЕТЕЙ
 
 Принцип работы:
-• 20+ нейросетей одновременно анализируют вопрос
+• 30+ нейросетей одновременно анализируют вопрос
 • Система находит консенсус большинства
-• Выдаётся единый точный ответ
+• Скорость ответа: 3-8 секунд
+• Распознавание фото через Vision-модели
 
 Возможности:
 • Математика (150 + 150 / 2 = 225)
 • Распознавание фото
-• Ответы на вопросы
+• Ответы на любые вопросы
 • Факты и шутки
 
 Введите запрос или отправьте фото.
@@ -75,7 +76,7 @@ def handle_photo(message):
         downloaded_file = bot.download_file(file_info.file_path)
         
         bot.send_chat_action(message.chat.id, 'typing')
-        status = bot.reply_to(message, "Анализ фото...")
+        status = bot.reply_to(message, "Анализ фото через Vision-модели...")
         
         analysis = brain.analyze_photo(downloaded_file, message.from_user.id)
         
@@ -118,7 +119,7 @@ def handle_message(message):
 
 if __name__ == "__main__":
     print("=" * 80)
-    print("ЗАПУСК TELEGRAM БОТА")
+    print("ЗАПУСК TELEGRAM БОТА — 30+ НЕЙРОСЕТЕЙ")
     print("=" * 80)
     
     try:
