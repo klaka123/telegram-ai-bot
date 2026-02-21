@@ -1,5 +1,5 @@
 """
-TELEGRAM БОТ — 30+ НЕЙРОСЕТЕЙ, НИКОГДА НЕ ЗАСЫПАЕТ
+TELEGRAM БОТ — Стабильная версия без конфликтов
 """
 
 import os
@@ -9,25 +9,28 @@ from model import brain
 from datetime import datetime
 import time
 import logging
-import keep_alive  # Импортируем keep-alive механизм
+import signal
+import sys
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Запускаем keep-alive механизм в отдельном потоке
-keep_alive.start_keep_alive()
-logging.info("✅ Keep-alive поток запущен")
-
 TOKEN = os.environ.get('BOT_TOKEN')
 if not TOKEN:
     logging.error("❌ ОШИБКА: BOT_TOKEN не найден!")
-    exit(1)
+    sys.exit(1)
 
 bot = telebot.TeleBot(TOKEN)
 logging.info("✅ Telegram бот инициализирован")
 
-users = {}
-bot_start = datetime.now()
+# Обработчик сигналов для корректного завершения
+def signal_handler(sig, frame):
+    logging.info("👋 Получен сигнал завершения, останавливаю бота...")
+    bot.stop_polling()
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -43,20 +46,12 @@ def start(message):
 • Система находит консенсус большинства
 • Скорость ответа: 3-8 секунд
 • Распознавание фото через Vision-модели
-• Бот работает 24/7 без засыпания
-
-Возможности:
-• Математика (150 + 150 / 2 = 225)
-• Распознавание фото
-• Ответы на любые вопросы
-• Факты и шутки
 
 Введите запрос или отправьте фото.
     """
     
     bot.send_message(message.chat.id, welcome, reply_markup=markup)
-    users[message.from_user.id] = {'messages': 0}
-    logging.info(f"👤 Новый пользователь: {message.from_user.first_name} (ID: {message.from_user.id})")
+    logging.info(f"👤 Новый пользователь: {message.from_user.first_name}")
 
 @bot.message_handler(commands=['help'])
 def help_command(message):
@@ -81,7 +76,6 @@ def help_command(message):
 def clear_command(message):
     if brain.clear_context(message.from_user.id):
         bot.reply_to(message, "История диалога очищена")
-        logging.info(f"🧹 Очищена история для пользователя {message.from_user.id}")
     else:
         bot.reply_to(message, "История уже пуста")
 
@@ -93,34 +87,27 @@ def handle_photo(message):
         downloaded_file = bot.download_file(file_info.file_path)
         
         bot.send_chat_action(message.chat.id, 'typing')
-        status = bot.reply_to(message, "📸 Анализ фото через Vision-модели...")
-        logging.info(f"📸 Получено фото от пользователя {message.from_user.id}")
+        status = bot.reply_to(message, "📸 Анализ фото...")
         
         analysis = brain.analyze_photo(downloaded_file, message.from_user.id)
         
         bot.delete_message(message.chat.id, status.message_id)
         bot.reply_to(message, analysis)
-        logging.info(f"✅ Фото обработано")
         
     except Exception as e:
-        error_msg = f"Ошибка обработки фото: {str(e)}"
-        bot.reply_to(message, error_msg)
-        logging.error(error_msg)
+        bot.reply_to(message, f"Ошибка: {str(e)}")
 
 @bot.message_handler(func=lambda m: True)
 def handle_message(message):
     user_id = message.from_user.id
     user_text = message.text
     
-    if user_id in users:
-        users[user_id]['messages'] += 1
-    
     # Обработка кнопок
     if user_text == '📷 Фото':
-        bot.reply_to(message, "Отправьте фото с примером для анализа")
+        bot.reply_to(message, "Отправьте фото с примером")
         return
     if user_text == '📝 Пример':
-        bot.reply_to(message, "Примеры запросов:\n• 150 + 150 / 2\n• cos 30°\n• x² - 5x + 6 = 0")
+        bot.reply_to(message, "Примеры:\n• 150 + 150 / 2\n• cos 30°\n• x² - 5x + 6 = 0")
         return
     if user_text == '🎭 Шутка':
         user_text = "расскажи шутку"
@@ -132,23 +119,21 @@ def handle_message(message):
     
     bot.send_chat_action(message.chat.id, 'typing')
     status = bot.reply_to(message, "🔄 Анализ запроса...")
-    logging.info(f"💬 Запрос от {user_id}: {user_text[:50]}...")
     
     response = brain.get_response(user_id, user_text)
     
     bot.delete_message(message.chat.id, status.message_id)
     bot.reply_to(message, response)
-    logging.info(f"✅ Ответ отправлен")
 
 if __name__ == "__main__":
     logging.info("=" * 80)
-    logging.info("🚀 ЗАПУСК TELEGRAM БОТА — 30+ НЕЙРОСЕТЕЙ, 24/7 РЕЖИМ")
+    logging.info("🚀 ЗАПУСК TELEGRAM БОТА")
     logging.info("=" * 80)
     
-    while True:
-        try:
-            bot.polling(non_stop=True, interval=0, timeout=20)
-        except Exception as e:
-            logging.error(f"❌ Ошибка polling: {e}")
-            logging.info("🔄 Перезапуск через 5 секунд...")
-            time.sleep(5)
+    try:
+        # Простой polling без бесконечного цикла
+        bot.polling(non_stop=True, interval=0, timeout=20)
+    except Exception as e:
+        logging.error(f"❌ Ошибка: {e}")
+    finally:
+        logging.info("👋 Бот завершил работу")
