@@ -1,5 +1,5 @@
 """
-TELEGRAM БОТ — Стабильная версия без зависаний
+TELEGRAM БОТ — Стабильная версия
 """
 
 import os
@@ -7,9 +7,9 @@ import telebot
 from telebot import types
 from model import brain
 import logging
-import time
 
-logging.basicConfig(level=logging.INFO)
+# Настройка логирования
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 TOKEN = os.environ.get('BOT_TOKEN')
 if not TOKEN:
@@ -77,7 +77,6 @@ def handle_message(message):
     bot.send_chat_action(message.chat.id, 'typing')
     status = bot.reply_to(message, "🔄 Анализ запроса...")
     
-    # Устанавливаем таймаут на всю операцию
     try:
         response = brain.get_response(message.from_user.id, user_text)
         bot.delete_message(message.chat.id, status.message_id)
@@ -92,4 +91,3 @@ if __name__ == "__main__":
         bot.polling(non_stop=True, interval=0, timeout=20)
     except Exception as e:
         logging.error(f"Ошибка: {e}")
-        time.sleep(5)
