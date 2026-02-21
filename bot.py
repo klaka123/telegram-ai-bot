@@ -1,5 +1,5 @@
 """
-TELEGRAM БОТ — С детальным прогрессом анализа
+TELEGRAM БОТ — Умный выбор нейросетей
 """
 
 import os
@@ -8,7 +8,6 @@ from telebot import types
 from model import brain
 import logging
 
-# Настройка логирования
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 TOKEN = os.environ.get('BOT_TOKEN')
@@ -17,67 +16,41 @@ if not TOKEN:
     exit(1)
 
 bot = telebot.TeleBot(TOKEN)
-
-# Передаем экземпляр бота в нейросеть
 brain.set_bot(bot)
 
 @bot.message_handler(commands=['start'])
 def start(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    markup.row('📷 Фото', '📝 Пример')
+    markup.row('📷 Фото', '📝 Пример', '🧠 Сложный вопрос')
     markup.row('🎭 Шутка', '📊 Факт', '❓ Помощь')
     
     welcome = """
-🔬 **СУПЕР-АНАЛИТИК — 30+ НЕЙРОСЕТЕЙ**
+🔬 **ИНТЕЛЛЕКТУАЛЬНАЯ СИСТЕМА — 31 НЕЙРОСЕТЬ**
 
-📊 **ДЕТАЛЬНЫЙ ПРОГРЕСС:**
-• Прогресс-бар с процентами
-• Время выполнения
-• Список отвечающих моделей
-• Статистика в реальном времени
+⚡ **БЫСТРЫЕ МОДЕЛИ** (для простых вопросов):
+• Step 3.5 Flash (2-3 сек)
+• Trinity Mini (3-4 сек)
+• Mistral 7B (4-5 сек)
 
-🤖 **30+ МОДЕЛЕЙ:**
+🧠 **МОЩНЫЕ МОДЕЛИ** (для сложных задач):
+• Gemini 2.0 Flash (1M контекста)
+• Llama 3.3 70B (GPT-4 уровень)
+• DeepSeek R1 (математика)
+• Qwen3 235B (наука)
+
+📸 **VISION МОДЕЛИ** (для фото):
 • Gemini 2.0 Flash (быстрейшая)
-• NVIDIA Nemotron VL (фото)
-• Step 3.5 Flash (350 токен/сек)
-• Trinity Mini (молниеносная)
-• И ещё 25+ нейросетей
+• NVIDIA Nemotron VL (OCR)
+• Qwen3 VL (видео/фото)
 
 📝 **Примеры:**
-• `150 + 150 / 2`
-• `cos 30°`
-• `x² - 5x + 6 = 0`
+• Простой: `150 + 150 / 2`
+• Сложный: `Объясни теорию относительности`
 
-Отправьте запрос или фото для анализа.
+Система сама выберет лучшие модели для вашего вопроса!
     """
     
     bot.send_message(message.chat.id, welcome, reply_markup=markup, parse_mode='Markdown')
-
-@bot.message_handler(commands=['help'])
-def help_command(message):
-    help_text = """
-📚 **Доступные команды:**
-/start - начало работы
-/help - справка
-/clear - сброс диалога
-
-📝 **Примеры запросов:**
-• 150 + 150 / 2
-• cos 30°
-• x² - 5x + 6 = 0
-• расскажи шутку
-• интересный факт
-
-📸 **Фото:** отправьте изображение с примером
-    """
-    bot.reply_to(message, help_text, parse_mode='Markdown')
-
-@bot.message_handler(commands=['clear'])
-def clear_command(message):
-    if brain.clear_context(message.from_user.id):
-        bot.reply_to(message, "🧹 История диалога очищена")
-    else:
-        bot.reply_to(message, "✅ История уже пуста")
 
 @bot.message_handler(content_types=['photo'])
 def handle_photo(message):
@@ -87,7 +60,7 @@ def handle_photo(message):
         downloaded_file = bot.download_file(file_info.file_path)
         
         bot.send_chat_action(message.chat.id, 'typing')
-        status = bot.reply_to(message, "📸 **Анализ фото...**\n\n⏳ Запускаю vision-нейросети...")
+        status = bot.reply_to(message, "📸 **Анализ фото...**\n\nЗапускаю vision-нейросети...")
         
         analysis = brain.analyze_photo(
             downloaded_file, 
@@ -111,18 +84,21 @@ def handle_message(message):
         bot.reply_to(message, "📸 Отправьте фото с примером для анализа")
         return
     if user_text == '📝 Пример':
-        bot.reply_to(message, "📝 **Примеры:**\n• `150 + 150 / 2`\n• `cos 30°`\n• `x² - 5x + 6 = 0`", parse_mode='Markdown')
+        bot.reply_to(message, "📝 **Примеры:**\n• Простой: `150 + 150 / 2`\n• Сложный: `Объясни теорию относительности`", parse_mode='Markdown')
+        return
+    if user_text == '🧠 Сложный вопрос':
+        bot.reply_to(message, "🧠 Задайте сложный вопрос (наука, философия, математика). Будут использованы мощные модели.")
         return
     if user_text == '🎭 Шутка':
         user_text = "расскажи шутку"
     if user_text == '📊 Факт':
         user_text = "интересный факт"
     if user_text == '❓ Помощь':
-        help_command(message)
+        bot.reply_to(message, "❓ /start - начало\n📷 Фото - анализ изображения\n🧠 Сложный вопрос - для сложных тем")
         return
     
     bot.send_chat_action(message.chat.id, 'typing')
-    status = bot.reply_to(message, "🔬 **Анализ запроса...**\n\n⏳ Запускаю 30+ нейросетей...")
+    status = bot.reply_to(message, "🔬 **Анализ запроса...**\n\nОпределяю сложность и выбираю модели...")
     
     try:
         response = brain.get_response(
@@ -140,7 +116,7 @@ def handle_message(message):
 
 if __name__ == "__main__":
     logging.info("=" * 80)
-    logging.info("🚀 ЗАПУСК TELEGRAM БОТА — ДЕТАЛЬНЫЙ ПРОГРЕСС")
+    logging.info("🚀 ЗАПУСК БОТА — 31 НЕЙРОСЕТЬ, УМНЫЙ ВЫБОР")
     logging.info("=" * 80)
     
     try:
